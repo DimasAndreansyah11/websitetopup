@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GameVault — Top-Up Voucher Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #7C3AED;
+    --primary-dark: #5B21B6;
+    --primary-light: #A78BFA;
+    --accent: #F59E0B;
+    --accent-dark: #D97706;
+    --surface: #0F0A1E;
+    --surface2: #1A1030;
+    --surface3: #241840;
+    --card: #1E1535;
+    --border: rgba(124, 58, 237, 0.25);
+    --border2: rgba(124, 58, 237, 0.5);
+    --text: #F1F0FF;
+    --text-muted: #9B8EC4;
+    --text-dim: #5E4D8A;
+    --success: #10B981;
+    --danger: #EF4444;
+    --info: #3B82F6;
+    --warning: #F59E0B;
+    --glow: 0 0 20px rgba(124, 58, 237, 0.3);
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--surface);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── PAGES ── */
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: flex; flex-direction: column; }
+
+  /* ── NAVBAR ── */
+  nav {
+    background: rgba(15,10,30,0.95);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: var(--primary-light);
+    letter-spacing: 2px;
+  }
+  .logo span { color: var(--accent); }
+  .nav-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+  .nav-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.65rem 1.5rem;
+    border-radius: 10px;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border2);
+  }
+  .btn-secondary:hover { background: var(--surface3); }
+  .btn-accent {
+    background: var(--accent);
+    color: #1a0a00;
+    font-weight: 700;
+  }
+  .btn-accent:hover { background: var(--accent-dark); transform: translateY(-1px); }
+  .btn-lg { padding: 0.85rem 2rem; font-size: 1rem; border-radius: 12px; }
+  .btn-full { width: 100%; justify-content: center; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+  /* ── INPUTS ── */
+  .form-group { margin-bottom: 1.25rem; }
+  .form-label { display: block; font-size: 0.82rem; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .form-control {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,58,237,0.15); }
+  .form-control.error { border-color: var(--danger); }
+  .error-msg { font-size: 0.8rem; color: var(--danger); margin-top: 5px; display: none; }
+  .error-msg.show { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+  .card-hover { transition: all 0.2s; cursor: pointer; }
+  .card-hover:hover { border-color: var(--primary); box-shadow: var(--glow); transform: translateY(-2px); }
+  .card-selected { border-color: var(--primary) !important; box-shadow: var(--glow) !important; }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-success { background: rgba(16,185,129,0.15); color: #34D399; }
+  .badge-danger { background: rgba(239,68,68,0.15); color: #FC8181; }
+  .badge-warning { background: rgba(245,158,11,0.15); color: #FCD34D; }
+  .badge-info { background: rgba(59,130,246,0.15); color: #93C5FD; }
+  .badge-primary { background: rgba(124,58,237,0.15); color: #A78BFA; }
+
+  /* ── PAGE CONTENT ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+  .section { padding: 2rem 0; }
+
+  /* ════════════════════════════════
+     PAGE 1: LOGIN
+  ════════════════════════════════ */
+  #page-login {
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.2) 0%, transparent 70%);
+    padding: 2rem;
+  }
+  .login-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+  }
+  .login-logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: var(--primary-light);
+    letter-spacing: 3px;
+  }
+  .login-logo span { color: var(--accent); }
+  .login-tagline { text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 2rem; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+  .social-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface3);
+    color: var(--text);
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    width: 100%;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s;
+  }
+  .social-btn:hover { border-color: var(--primary); }
+
+  /* ════════════════════════════════
+     PAGE 2: GAME SELECTION
+  ════════════════════════════════ */
+  .hero-banner {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, #1a0830 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 0;
+    text-align: center;
+  }
+  .hero-banner h1 { font-family: 'Orbitron', monospace; font-size: 1.6rem; font-weight: 700; letter-spacing: 2px; margin-bottom: 0.4rem; }
+  .hero-banner p { color: var(--text-muted); font-size: 0.9rem; }
+
+  .search-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.6rem 1rem;
+    max-width: 500px;
+    margin: 1.5rem auto 0;
+  }
+  .search-bar input {
+    flex: 1; background: none; border: none; outline: none;
+    color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.9rem;
+  }
+  .search-icon { color: var(--text-muted); font-size: 1.1rem; }
+
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem 0;
+  }
+  .game-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .game-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: var(--glow); }
+  .game-card-thumb {
+    height: 110px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem;
+  }
+  .game-card-info { padding: 0.75rem; }
+  .game-card-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }
+  .game-card-cat { font-size: 0.75rem; color: var(--text-muted); }
+  .game-popular { border-top: 2px solid var(--accent); }
+
+  .category-tabs {
+    display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 1rem;
+    scrollbar-width: none;
+  }
+  .category-tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    white-space: nowrap; padding: 0.45rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.82rem; font-family: 'Inter', sans-serif; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .tab-btn.active, .tab-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  /* ════════════════════════════════
+     PAGE 3: TOP-UP FORM
+  ════════════════════════════════ */
+  .topup-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  @media (max-width: 700px) {
+    .topup-layout { grid-template-columns: 1fr; }
+  }
+  .game-header {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .game-icon-lg {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.2rem;
+    border: 1px solid var(--border);
+    background: var(--surface3);
+    flex-shrink: 0;
+  }
+  .step-indicator { display: flex; gap: 0; margin-bottom: 1.5rem; }
+  .step-dot {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.8rem; font-weight: 500; color: var(--text-dim);
+  }
+  .step-dot.active { color: var(--primary-light); }
+  .step-dot.done { color: var(--success); }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--surface3); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+  }
+  .step-dot.active .step-num { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .step-dot.done .step-num { background: var(--success); border-color: var(--success); color: #fff; }
+  .step-line { flex: 1; height: 1px; background: var(--border); margin: 0 8px; align-self: center; }
+
+  .nominal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.65rem;
+  }
+  .nominal-btn {
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nominal-btn:hover, .nominal-btn.selected {
+    border-color: var(--primary);
+    background: rgba(124,58,237,0.1);
+  }
+  .nominal-btn .nominal-currency { font-size: 0.75rem; color: var(--text-muted); }
+  .nominal-btn .nominal-amount { font-size: 1rem; font-weight: 700; font-family: 'Orbitron', monospace; color: var(--primary-light); }
+  .nominal-btn .nominal-price { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+  .nominal-btn .nominal-bonus { font-size: 0.7rem; color: var(--accent); }
+
+  .payment-option {
+    display: flex; align-items: center; gap: 12px;
+    padding: 0.75rem 1rem;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 0.5rem;
+  }
+  .payment-option:hover, .payment-option.selected {
+    border-color: var(--primary);
+    background: rgba(124,58,237,0.08);
+  }
+  .payment-radio {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid var(--border2);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .payment-option.selected .payment-radio { border-color: var(--primary); background: var(--primary); }
+  .payment-option.selected .payment-radio::after {
+    content: ''; width: 6px; height: 6px; border-radius: 50%; background: #fff;
+  }
+  .payment-icon { font-size: 1.4rem; }
+  .payment-name { font-weight: 600; font-size: 0.9rem; }
+  .payment-desc { font-size: 0.75rem; color: var(--text-muted); }
+  .payment-fee { margin-left: auto; font-size: 0.78rem; color: var(--text-muted); text-align: right; }
+
+  /* ORDER SUMMARY */
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem;
+    position: sticky;
+    top: 80px;
+  }
+  .summary-title { font-weight: 700; font-size: 1rem; margin-bottom: 1rem; color: var(--primary-light); }
+  .summary-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.88rem;
+  }
+  .summary-row:last-of-type { border-bottom: none; }
+  .summary-row .label { color: var(--text-muted); }
+  .summary-total { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+  .promo-input-wrap { display: flex; gap: 8px; margin-top: 0.75rem; }
+  .promo-input-wrap .form-control { margin-bottom: 0; flex: 1; }
+  .promo-status { font-size: 0.8rem; margin-top: 6px; display: none; }
+  .promo-status.success { display: block; color: var(--success); }
+  .promo-status.error { display: block; color: var(--danger); }
+
+  /* id validation */
+  .id-verify-row {
+    display: flex; gap: 8px; align-items: flex-end; margin-bottom: 1.25rem;
+  }
+  .id-verify-row .form-group { flex: 1; margin-bottom: 0; }
+  .verified-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 8px;
+    font-size: 0.78rem; color: #34D399; margin-top: 6px;
+    display: none;
+  }
+  .verified-chip.show { display: inline-flex; }
+
+  /* ════════════════════════════════
+     PAGE 4: PAYMENT QR
+  ════════════════════════════════ */
+  .payment-page {
+    align-items: center; justify-content: center; padding: 2rem;
+    background: radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.12) 0%, transparent 60%);
+  }
+  .payment-box {
+    max-width: 440px; width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 2rem;
+    text-align: center;
+  }
+  .qr-frame {
+    width: 180px; height: 180px;
+    margin: 1.25rem auto;
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .qr-inner { width: 100%; height: 100%; }
+  .countdown-ring {
+    font-family: 'Orbitron', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0.5rem 0;
+  }
+  .countdown-label { font-size: 0.8rem; color: var(--text-muted); }
+  .va-number {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem;
+    letter-spacing: 4px;
+    color: var(--primary-light);
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+  }
+
+  /* ════════════════════════════════
+     PAGE 5: PROCESSING / SUCCESS / FAIL
+  ════════════════════════════════ */
+  .result-page {
+    align-items: center; justify-content: center; padding: 2rem;
+  }
+  .result-box {
+    max-width: 460px; width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 2.5rem;
+    text-align: center;
+  }
+  .result-icon { font-size: 5rem; margin-bottom: 1rem; }
+  .result-title { font-family: 'Orbitron', monospace; font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .result-sub { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.6; }
+  .transaction-detail {
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: left;
+    margin-bottom: 1.5rem;
+  }
+  .transaction-detail .row {
+    display: flex; justify-content: space-between;
+    font-size: 0.85rem; padding: 0.35rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .transaction-detail .row:last-child { border-bottom: none; }
+  .transaction-detail .row .key { color: var(--text-muted); }
+  .transaction-detail .row .val { font-weight: 500; }
+
+  /* ════════════════════════════════
+     PAGE 6: ORDER HISTORY
+  ════════════════════════════════ */
+  .order-item {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .order-item:hover { border-color: var(--primary); }
+  .order-icon { font-size: 2rem; flex-shrink: 0; }
+  .order-info { flex: 1; }
+  .order-game { font-weight: 600; font-size: 0.95rem; }
+  .order-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+  .order-meta { text-align: right; }
+  .order-price { font-weight: 700; color: var(--primary-light); font-size: 0.95rem; }
+  .order-date { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+  /* ════════════════════════════════
+     ANIMATIONS
+  ════════════════════════════════ */
+  @keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(124,58,237,0.4); }
+    70% { box-shadow: 0 0 0 12px rgba(124,58,237,0); }
+    100% { box-shadow: 0 0 0 0 rgba(124,58,237,0); }
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes bounce { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+  .animate-in { animation: fadeIn 0.4s ease forwards; }
+  .spinner {
+    width: 48px; height: 48px;
+    border: 4px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+    margin: 0 auto 1.5rem;
+  }
+  .pulse { animation: pulse-ring 2s infinite; border-radius: 50%; }
+
+  /* toast */
+  #toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.88rem;
+    max-width: 300px;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.35s;
+    z-index: 999;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  #toast.show { transform: none; opacity: 1; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* section label */
+  .section-label {
+    font-size: 0.75rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--primary-light); margin-bottom: 0.75rem;
+  }
+  .section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; }
+
+  .divider-line { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ══════════════════════════════
+     PAGE 1: LOGIN
+══════════════════════════════ -->
+<div id="page-login" class="page active">
+  <div class="login-box animate-in">
+    <div class="login-logo">GAME<span>VAULT</span></div>
+    <div class="login-tagline">Top-up diamond & voucher game favoritemu</div>
+
+    <button class="social-btn" onclick="loginWith('Google')">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Masuk dengan Google
+    </button>
+
+    <hr class="divider"/>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" id="login-email" class="form-control" placeholder="gamer@email.com" value=""/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" id="login-pass" class="form-control" placeholder="••••••••"/>
+    </div>
+    <div id="login-error" class="error-msg">Email atau password salah. Coba lagi.</div>
+
+    <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()" style="margin-top:0.5rem">
+      Masuk ke Akun
+    </button>
+
+    <p style="text-align:center; font-size:0.8rem; color:var(--text-muted); margin-top:1rem;">
+      Belum punya akun? <a href="#" style="color:var(--primary-light)" onclick="showToast('Fitur daftar segera hadir!')">Daftar sekarang</a>
+    </p>
+    <p style="text-align:center; font-size:0.75rem; color:var(--text-dim); margin-top:0.5rem;">
+      Demo: ketik email apa saja lalu klik Masuk
+    </p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════
+     PAGE 2: GAME SELECTION
+══════════════════════════════ -->
+<div id="page-games" class="page">
+  <nav>
+    <div class="logo">GAME<span>VAULT</span></div>
+    <div class="nav-user">
+      <span id="nav-username">User</span>
+      <div class="nav-avatar" id="nav-avatar" onclick="goToHistory()">U</div>
+    </div>
+  </nav>
+
+  <div class="hero-banner">
+    <div class="container">
+      <h1>🎮 TOP-UP GAME</h1>
+      <p>Pilih game favoritemu &amp; top-up instan</p>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="game-search" placeholder="Cari game..." oninput="filterGames(this.value)"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="container section">
+    <div class="category-tabs" id="cat-tabs">
+      <button class="tab-btn active" onclick="setCategory('all', this)">Semua</button>
+      <button class="tab-btn" onclick="setCategory('battle royale', this)">Battle Royale</button>
+      <button class="tab-btn" onclick="setCategory('moba', this)">MOBA</button>
+      <button class="tab-btn" onclick="setCategory('rpg', this)">RPG</button>
+      <button class="tab-btn" onclick="setCategory('shooter', this)">Shooter</button>
+    </div>
+
+    <div class="games-grid" id="games-grid"></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════
+     PAGE 3: TOP-UP FORM
+══════════════════════════════ -->
+<div id="page-topup" class="page">
+  <nav>
+    <div class="logo">GAME<span>VAULT</span></div>
+    <div class="nav-user">
+      <button class="btn btn-secondary" onclick="goTo('page-games')" style="padding:0.4rem 0.9rem; font-size:0.8rem">← Kembali</button>
+      <div class="nav-avatar" onclick="goToHistory()">U</div>
+    </div>
+  </nav>
+
+  <div class="container section">
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+      <div class="step-dot done" id="step1">
+        <div class="step-num">✓</div>
+        <span>Pilih Game</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-dot active" id="step2">
+        <div class="step-num">2</div>
+        <span>Isi Data</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-dot" id="step3">
+        <div class="step-num">3</div>
+        <span>Pembayaran</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-dot" id="step4">
+        <div class="step-num">4</div>
+        <span>Selesai</span>
+      </div>
+    </div>
+
+    <div class="topup-layout">
+      <!-- LEFT PANEL -->
+      <div>
+        <!-- Game Header -->
+        <div class="game-header">
+          <div class="game-icon-lg" id="selected-game-icon">🎮</div>
+          <div>
+            <div class="section-label">Top-Up</div>
+            <div style="font-size:1.3rem; font-weight:700;" id="selected-game-name">Game Name</div>
+            <div style="font-size:0.82rem; color:var(--text-muted);" id="selected-game-sub">Currency game</div>
+          </div>
+        </div>
+
+        <!-- Step A: Masukkan ID -->
+        <div class="card" style="margin-bottom:1rem">
+          <div class="section-label">1. Masukkan ID Game</div>
+          <div class="id-verify-row">
+            <div class="form-group">
+              <label class="form-label">User ID</label>
+              <input type="text" id="game-user-id" class="form-control" placeholder="Contoh: 12345678" oninput="resetIdVerify()"/>
+              <div class="error-msg" id="id-error">ID tidak valid atau tidak ditemukan</div>
+            </div>
+            <div class="form-group" id="server-group" style="display:none">
+              <label class="form-label">Server</label>
+              <select class="form-control" id="game-server">
+                <option>Indonesia</option>
+                <option>Asia</option>
+                <option>Global</option>
+              </select>
+            </div>
+            <button class="btn btn-secondary" style="flex-shrink:0; height:42px; align-self:flex-end" onclick="verifyGameId()">
+              Cek ID
+            </button>
+          </div>
+          <div class="verified-chip" id="verified-chip">
+            <span>✓</span>
+            <span id="verified-name">Username</span>
+          </div>
+        </div>
+
+        <!-- Step B: Pilih Nominal -->
+        <div class="card" style="margin-bottom:1rem">
+          <div class="section-label">2. Pilih Nominal</div>
+          <div class="nominal-grid" id="nominal-grid"></div>
+        </div>
+
+        <!-- Step C: Metode Pembayaran -->
+        <div class="card">
+          <div class="section-label">3. Metode Pembayaran</div>
+          <div style="margin-bottom:0.75rem; font-size:0.82rem; color:var(--text-muted);">QRIS</div>
+          <div class="payment-option" onclick="selectPayment(this,'qris')" data-method="qris">
+            <div class="payment-radio"></div>
+            <span class="payment-icon">📲</span>
+            <div>
+              <div class="payment-name">QRIS</div>
+              <div class="payment-desc">Scan dengan aplikasi apapun</div>
+            </div>
+            <div class="payment-fee">Gratis</div>
+          </div>
+          <div style="margin: 0.75rem 0; font-size:0.82rem; color:var(--text-muted);">Virtual Account</div>
+          <div class="payment-option" onclick="selectPayment(this,'bca')" data-method="bca">
+            <div class="payment-radio"></div>
+            <span class="payment-icon">🏦</span>
+            <div>
+              <div class="payment-name">BCA Virtual Account</div>
+              <div class="payment-desc">Transfer dari BCA</div>
+            </div>
+            <div class="payment-fee">Gratis</div>
+          </div>
+          <div class="payment-option" onclick="selectPayment(this,'mandiri')" data-method="mandiri">
+            <div class="payment-radio"></div>
+            <span class="payment-icon">🏦</span>
+            <div>
+              <div class="payment-name">Mandiri Virtual Account</div>
+              <div class="payment-desc">Transfer dari Mandiri</div>
+            </div>
+            <div class="payment-fee">Gratis</div>
+          </div>
+          <div style="margin: 0.75rem 0; font-size:0.82rem; color:var(--text-muted);">E-Wallet</div>
+          <div class="payment-option" onclick="selectPayment(this,'gopay')" data-method="gopay">
+            <div class="payment-radio"></div>
+            <span class="payment-icon">💚</span>
+            <div>
+              <div class="payment-name">GoPay</div>
+              <div class="payment-desc">Bayar via GoPay</div>
+            </div>
+            <div class="payment-fee">Gratis</div>
+          </div>
+          <div class="payment-option" onclick="selectPayment(this,'dana')" data-method="dana">
+            <div class="payment-radio"></div>
+            <span class="payment-icon">💙</span>
+            <div>
+              <div class="payment-name">DANA</div>
+              <div class="payment-desc">Bayar via DANA</div>
+            </div>
+            <div class="payment-fee">Gratis</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL: Summary -->
+      <div class="summary-card">
+        <div class="summary-title">📋 Ringkasan Pesanan</div>
+
+        <div class="summary-row">
+          <span class="label">Game</span>
+          <span id="sum-game">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">User ID</span>
+          <span id="sum-uid">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Username</span>
+          <span id="sum-uname">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Item</span>
+          <span id="sum-item">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Harga</span>
+          <span id="sum-price">—</span>
+        </div>
+        <div class="summary-row" id="sum-discount-row" style="display:none">
+          <span class="label" style="color:var(--success)">Diskon Promo</span>
+          <span id="sum-discount" style="color:var(--success)">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Metode</span>
+          <span id="sum-method">—</span>
+        </div>
+
+        <hr class="divider-line"/>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
+          <span style="font-weight:600">Total</span>
+          <span class="summary-total" id="sum-total">—</span>
+        </div>
+
+        <!-- Promo Code -->
+        <div class="section-label" style="margin-bottom:0.5rem">Kode Promo</div>
+        <div class="promo-input-wrap">
+          <input type="text" class="form-control" id="promo-input" placeholder="Masukkan kode" style="font-size:0.85rem"/>
+          <button class="btn btn-secondary" onclick="applyPromo()" style="padding:0.5rem 0.85rem; font-size:0.82rem; flex-shrink:0">Terapkan</button>
+        </div>
+        <div class="promo-status" id="promo-status"></div>
+
+        <hr class="divider-line"/>
+
+        <button class="btn btn-accent btn-full btn-lg" id="checkout-btn" onclick="doCheckout()">
+          Bayar Sekarang →
+        </button>
+        <p style="text-align:center; font-size:0.72rem; color:var(--text-dim); margin-top:0.5rem">
+          Top-up diproses otomatis dalam &lt;1 menit
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════
+     PAGE 4: PAYMENT (QRIS / VA)
+══════════════════════════════ -->
+<div id="page-payment" class="page payment-page">
+  <div class="payment-box animate-in">
+    <div class="section-label" style="text-align:center">Menunggu Pembayaran</div>
+    <div style="font-size:1.2rem; font-weight:700; margin-bottom:0.25rem" id="pay-method-title">Scan QRIS</div>
+    <div style="font-size:0.85rem; color:var(--text-muted)" id="pay-total-display">Rp 0</div>
+
+    <!-- QRIS -->
+    <div id="qris-section">
+      <div class="qr-frame">
+        <!-- QR SVG placeholder -->
+        <svg class="qr-inner" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" fill="white"/>
+          <rect x="5" y="5" width="40" height="40" fill="none" stroke="#000" stroke-width="4"/>
+          <rect x="10" y="10" width="30" height="30" fill="#000"/>
+          <rect x="75" y="5" width="40" height="40" fill="none" stroke="#000" stroke-width="4"/>
+          <rect x="80" y="10" width="30" height="30" fill="#000"/>
+          <rect x="5" y="75" width="40" height="40" fill="none" stroke="#000" stroke-width="4"/>
+          <rect x="10" y="80" width="30" height="30" fill="#000"/>
+          <!-- data cells -->
+          <rect x="55" y="5" width="8" height="8" fill="#000"/>
+          <rect x="65" y="5" width="8" height="8" fill="#000"/>
+          <rect x="55" y="15" width="8" height="8" fill="#000"/>
+          <rect x="55" y="55" width="8" height="8" fill="#000"/>
+          <rect x="65" y="55" width="8" height="8" fill="#000"/>
+          <rect x="75" y="55" width="8" height="8" fill="#000"/>
+          <rect x="85" y="55" width="8" height="8" fill="#000"/>
+          <rect x="95" y="55" width="8" height="8" fill="#000"/>
+          <rect x="105" y="55" width="8" height="8" fill="#000"/>
+          <rect x="55" y="65" width="8" height="8" fill="#000"/>
+          <rect x="85" y="65" width="8" height="8" fill="#000"/>
+          <rect x="55" y="75" width="8" height="8" fill="#000"/>
+          <rect x="65" y="75" width="8" height="8" fill="#000"/>
+          <rect x="95" y="75" width="8" height="8" fill="#000"/>
+          <rect x="55" y="85" width="8" height="8" fill="#000"/>
+          <rect x="75" y="85" width="8" height="8" fill="#000"/>
+          <rect x="105" y="85" width="8" height="8" fill="#000"/>
+          <rect x="55" y="95" width="8" height="8" fill="#000"/>
+          <rect x="65" y="95" width="8" height="8" fill="#000"/>
+          <rect x="85" y="95" width="8" height="8" fill="#000"/>
+          <rect x="95" y="95" width="8" height="8" fill="#000"/>
+          <!-- center logo -->
+          <rect x="47" y="47" width="26" height="26" rx="4" fill="#7C3AED"/>
+          <text x="60" y="64" text-anchor="middle" fill="white" font-size="12" font-weight="bold">GV</text>
+        </svg>
+      </div>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem">
+        Buka aplikasi e-wallet/bank, scan QR di atas
+      </p>
+    </div>
+
+    <!-- VA -->
+    <div id="va-section" style="display:none">
+      <p style="font-size:0.82rem; color:var(--text-muted); margin-top:1rem">Nomor Virtual Account</p>
+      <div class="va-number" id="va-number-display">0000 0000 0000</div>
+      <button class="btn btn-secondary btn-full" onclick="copyVA()" style="margin-bottom:1rem">
+        📋 Salin Nomor VA
+      </button>
+    </div>
+
+    <div style="background:var(--surface3); border-radius:10px; padding:0.75rem 1rem; margin-bottom:1rem; text-align:left; font-size:0.82rem;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:4px">
+        <span style="color:var(--text-muted)">Order ID</span>
+        <span id="pay-order-id" style="font-family:'Orbitron',monospace; font-size:0.75rem; color:var(--primary-light)">#GV00000</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:4px">
+        <span style="color:var(--text-muted)">Game</span>
+        <span id="pay-game">—</span>
+      </div>
+      <div style="display:flex; justify-content:space-between">
+        <span style="color:var(--text-muted)">Item</span>
+        <span id="pay-item">—</span>
+      </div>
+    </div>
+
+    <div class="countdown-label">Selesaikan pembayaran dalam</div>
+    <div class="countdown-ring" id="countdown">14:59</div>
+    <div class="countdown-label" style="margin-bottom:1.25rem">menit</div>
+
+    <!-- Simulate buttons for demo -->
+    <div style="display:flex; gap:8px">
+      <button class="btn btn-accent btn-full" onclick="simulatePayment(true)">✅ Simulasi Bayar Sukses</button>
+      <button class="btn btn-secondary" onclick="simulatePayment(false)" style="flex-shrink:0; font-size:0.8rem">❌ Gagal</button>
+    </div>
+    <p style="font-size:0.72rem; color:var(--text-dim); margin-top:0.5rem">
+      (Demo mode — klik tombol di atas untuk simulasi)
+    </p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════
+     PAGE 5A: PROCESSING
+══════════════════════════════ -->
+<div id="page-processing" class="page result-page">
+  <div class="result-box animate-in">
+    <div class="spinner"></div>
+    <div class="result-title">Memproses Top-Up...</div>
+    <div class="result-sub">
+      Pembayaran diterima! Kami sedang mengirim diamond ke akunmu.<br/>
+      Mohon tunggu sebentar.
+    </div>
+    <div style="display:flex; gap:6px; flex-direction:column; font-size:0.82rem; color:var(--text-muted);">
+      <div id="proc-step1">⏳ Menerima konfirmasi pembayaran...</div>
+      <div id="proc-step2" style="opacity:0.3">⏳ Menghubungi server game...</div>
+      <div id="proc-step3" style="opacity:0.3">⏳ Menginjeksi item ke akun...</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════
+     PAGE 5B: SUCCESS
+══════════════════════════════ -->
+<div id="page-success" class="page result-page">
+  <div class="result-box animate-in">
+    <div class="result-icon" style="animation: bounce 0.6s ease">✅</div>
+    <div class="result-title" style="color:var(--success)">Top-Up Berhasil!</div>
+    <div class="result-sub">
+      Item telah berhasil dikirim ke akunmu.<br/>
+      Cek game mu sekarang!
+    </div>
+
+    <div class="transaction-detail">
+      <div class="row">
+        <span class="key">Order ID</span>
+        <span class="val" id="suc-order-id" style="font-family:'Orbitron',monospace; font-size:0.8rem; color:var(--primary-light)">#GV00000</span>
+      </div>
+      <div class="row">
+        <span class="key">Game</span>
+        <span class="val" id="suc-game">—</span>
+      </div>
+      <div class="row">
+        <span class="key">User ID</span>
+        <span class="val" id="suc-uid">—</span>
+      </div>
+      <div class="row">
+        <span class="key">Username</span>
+        <span class="val" id="suc-uname">—</span>
+      </div>
+      <div class="row">
+        <span class="key">Item</span>
+        <span class="val" id="suc-item">—</span>
+      </div>
+      <div class="row">
+        <span class="key">Total Bayar</span>
+        <span class="val" id="suc-total" style="color:var(--accent); font-weight:700">—</span>
+      </div>
+      <div class="row">
+        <span class="key">Metode</span>
+        <span class="val" id="suc-method">—</span>
+      </div>
+      <div class="row">
+        <span class="key">Status</span>
+        <span class="val"><span class="badge badge-success">✓ Sukses</span></span>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-bottom:0.75rem">
+      <button class="btn btn-secondary btn-full" onclick="downloadInvoice()">📄 Unduh Invoice PDF</button>
+      <button class="btn btn-secondary" onclick="goToHistory()" style="flex-shrink:0; font-size:0.82rem">📋 Riwayat</button>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="goTo('page-games')">🎮 Top-Up Lagi</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════
+     PAGE 5C: FAILED
+══════════════════════════════ -->
+<div id="page-failed" class="page result-page">
+  <div class="result-box animate-in">
+    <div class="result-icon">❌</div>
+    <div class="result-title" style="color:var(--danger)">Top-Up Gagal</div>
+    <div class="result-sub">
+      Maaf, terjadi kesalahan saat memproses top-up.<br/>
+      Dana kamu <strong>tidak akan terpotong</strong>. Silakan coba kembali.
+    </div>
+    <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:10px; padding:1rem; font-size:0.82rem; color:var(--text-muted); margin-bottom:1.5rem; text-align:left">
+      ⚠️ Notifikasi kegagalan telah dikirim ke email kamu. Jika dana sudah terpotong, akan dikembalikan dalam 1×24 jam.
+    </div>
+    <button class="btn btn-primary btn-full" onclick="retryTopup()" style="margin-bottom:0.75rem">🔄 Coba Lagi</button>
+    <button class="btn btn-secondary btn-full" onclick="goTo('page-games')">🏠 Kembali ke Beranda</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════
+     PAGE 6: ORDER HISTORY
+══════════════════════════════ -->
+<div id="page-history" class="page">
+  <nav>
+    <div class="logo">GAME<span>VAULT</span></div>
+    <div class="nav-user">
+      <button class="btn btn-secondary" onclick="goTo('page-games')" style="padding:0.4rem 0.9rem; font-size:0.8rem">← Beranda</button>
+    </div>
+  </nav>
+
+  <div class="container section">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem">
+      <div>
+        <div class="section-label">Akun Kamu</div>
+        <div class="section-title">Riwayat Pesanan</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:0.8rem; color:var(--text-muted)">Bergabung sejak</div>
+        <div style="font-size:0.88rem; font-weight:500">Juni 2025</div>
+      </div>
+    </div>
+
+    <div id="history-list">
+      <!-- filled dynamically -->
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ════════════════ DATA ════════════════ */
+const GAMES = [
+  { id:'ml', name:'Mobile Legends', icon:'⚔️', cat:'moba', sub:'Diamond ML', popular:true, servers:true,
+    nominals:[
+      {currency:'💎',amount:'86',bonus:'',price:19000},
+      {currency:'💎',amount:'172',bonus:'+5 bonus',price:37000},
+      {currency:'💎',amount:'257',bonus:'',price:55000},
+      {currency:'💎',amount:'344',bonus:'+15',price:72000},
+      {currency:'💎',amount:'514',bonus:'+20',price:108000},
+      {currency:'💎',amount:'706',bonus:'+50',price:145000},
+      {currency:'💎',amount:'1412',bonus:'+100',price:285000},
+      {currency:'💎',amount:'2195',bonus:'+200',price:440000},
+      {currency:'💎',amount:'3688',bonus:'+300',price:730000},
+    ]
+  },
+  { id:'ff', name:'Free Fire', icon:'🔥', cat:'battle royale', sub:'Diamond FF', popular:true, servers:false,
+    nominals:[
+      {currency:'💎',amount:'70',bonus:'',price:11000},
+      {currency:'💎',amount:'140',bonus:'',price:21000},
+      {currency:'💎',amount:'355',bonus:'',price:52000},
+      {currency:'💎',amount:'720',bonus:'+50',price:103000},
+      {currency:'💎',amount:'1450',bonus:'+100',price:205000},
+      {currency:'💎',amount:'3100',bonus:'+200',price:430000},
+    ]
+  },
+  { id:'pubg', name:'PUBG Mobile', icon:'🎯', cat:'battle royale', sub:'UC PUBG', popular:false, servers:false,
+    nominals:[
+      {currency:'🪙',amount:'60 UC',bonus:'',price:14000},
+      {currency:'🪙',amount:'325 UC',bonus:'+25 bonus',price:69000},
+      {currency:'🪙',amount:'660 UC',bonus:'+66 bonus',price:139000},
+      {currency:'🪙',amount:'1800 UC',bonus:'+180',price:379000},
+    ]
+  },
+  { id:'genshin', name:'Genshin Impact', icon:'🌙', cat:'rpg', sub:'Genesis Crystal', popular:false, servers:true,
+    nominals:[
+      {currency:'💎',amount:'60',bonus:'',price:14000},
+      {currency:'💎',amount:'300',bonus:'+30',price:69000},
+      {currency:'💎',amount:'980',bonus:'+110',price:209000},
+      {currency:'💎',amount:'1980',bonus:'+260',price:419000},
+      {currency:'💎',amount:'3280',bonus:'+600',price:699000},
+    ]
+  },
+  { id:'valo', name:'Valorant', icon:'🔫', cat:'shooter', sub:'VP Valorant', popular:false, servers:false,
+    nominals:[
+      {currency:'💠',amount:'475 VP',bonus:'',price:55000},
+      {currency:'💠',amount:'1000 VP',bonus:'',price:109000},
+      {currency:'💠',amount:'2050 VP',bonus:'',price:219000},
+      {currency:'💠',amount:'3650 VP',bonus:'',price:369000},
+    ]
+  },
+  { id:'honkai', name:'Honkai: SR', icon:'⚡', cat:'rpg', sub:'Oneiric Shard', popular:false, servers:true,
+    nominals:[
+      {currency:'💠',amount:'60',bonus:'',price:15000},
+      {currency:'💠',amount:'300',bonus:'+30',price:75000},
+      {currency:'💠',amount:'980',bonus:'+110',price:215000},
+    ]
+  },
+];
+
+const PROMO_CODES = {
+  'GAMEVAULT10': { type:'percent', value:10, label:'Diskon 10%' },
+  'NEWUSER20':   { type:'percent', value:20, label:'Diskon 20% (New User)' },
+  'GRATIS5K':    { type:'fixed',   value:5000, label:'Potongan Rp 5.000' },
+};
+
+let state = {
+  user: null,
+  selectedGame: null,
+  selectedNominal: null,
+  gameUserId: '',
+  gameUsername: '',
+  paymentMethod: null,
+  promoApplied: null,
+  orderId: null,
+  orders: [],
+  countdown: null,
+  currentCategory: 'all',
+};
+
+/* ════════════════ UTILS ════════════════ */
+function fmtPrice(n) {
+  return 'Rp ' + n.toLocaleString('id-ID');
+}
+
+function genOrderId() {
+  return '#GV' + Math.floor(Math.random()*900000+100000);
+}
+
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = type==='success' ? '#10B981' : type==='danger' ? '#EF4444' : 'var(--border)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function goTo(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const p = document.getElementById(pageId);
+  p.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ════════════════ LOGIN ════════════════ */
+function loginWith(method) {
+  state.user = { email: method+'@demo.com', name: method+' User', avatar: method[0].toUpperCase() };
+  afterLogin();
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const err   = document.getElementById('login-error');
+
+  if (!email) {
+    err.textContent = 'Masukkan email kamu.';
+    err.classList.add('show'); return;
+  }
+  err.classList.remove('show');
+
+  const name = email.split('@')[0];
+  state.user = { email, name, avatar: name[0].toUpperCase() };
+  afterLogin();
+}
+
+function afterLogin() {
+  document.getElementById('nav-username').textContent = state.user.name;
+  document.getElementById('nav-avatar').textContent = state.user.avatar;
+  loadOrders();
+  goTo('page-games');
+  renderGames();
+}
+
+/* ════════════════ GAMES PAGE ════════════════ */
+function renderGames(filter='', cat='all') {
+  const grid = document.getElementById('games-grid');
+  const filtered = GAMES.filter(g =>
+    (cat === 'all' || g.cat === cat) &&
+    (g.name.toLowerCase().includes(filter.toLowerCase()))
+  );
+  grid.innerHTML = filtered.map(g => `
+    <div class="game-card ${g.popular?'game-popular':''}" onclick="selectGame('${g.id}')">
+      <div class="game-card-thumb" style="background:var(--surface3)">${g.icon}</div>
+      <div class="game-card-info">
+        <div class="game-card-name">${g.name}</div>
+        <div class="game-card-cat">${g.sub} ${g.popular?'<span class="badge badge-warning" style="margin-left:4px">🔥 Popular</span>':''}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterGames(v) { renderGames(v, state.currentCategory); }
+
+function setCategory(cat, el) {
+  state.currentCategory = cat;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderGames(document.getElementById('game-search').value, cat);
+}
+
+function selectGame(id) {
+  state.selectedGame = GAMES.find(g => g.id === id);
+  state.selectedNominal = null;
+  state.promoApplied = null;
+  state.gameUserId = '';
+  state.gameUsername = '';
+  loadTopupPage();
+  goTo('page-topup');
+}
+
+/* ════════════════ TOPUP PAGE ════════════════ */
+function loadTopupPage() {
+  const g = state.selectedGame;
+  document.getElementById('selected-game-icon').textContent = g.icon;
+  document.getElementById('selected-game-name').textContent = g.name;
+  document.getElementById('selected-game-sub').textContent  = g.sub;
+  document.getElementById('sum-game').textContent = g.name;
+  document.getElementById('game-user-id').value = '';
+  document.getElementById('verified-chip').classList.remove('show');
+  document.getElementById('id-error').classList.remove('show');
+  document.getElementById('promo-input').value = '';
+  document.getElementById('promo-status').className = 'promo-status';
+  document.getElementById('sum-discount-row').style.display = 'none';
+
+  // server selector
+  document.getElementById('server-group').style.display = g.servers ? 'block' : 'none';
+
+  // nominals
+  const grid = document.getElementById('nominal-grid');
+  grid.innerHTML = g.nominals.map((n,i) => `
+    <div class="nominal-btn" onclick="selectNominal(${i})">
+      <div class="nominal-currency">${n.currency}</div>
+      <div class="nominal-amount">${n.amount}</div>
+      <div class="nominal-price">${fmtPrice(n.price)}</div>
+      ${n.bonus ? `<div class="nominal-bonus">+${n.bonus}</div>` : ''}
+    </div>
+  `).join('');
+
+  // reset payment
+  document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+  state.paymentMethod = null;
+
+  updateSummary();
+}
+
+function selectNominal(idx) {
+  state.selectedNominal = state.selectedGame.nominals[idx];
+  document.querySelectorAll('.nominal-btn').forEach((b,i) => {
+    b.classList.toggle('selected', i === idx);
+  });
+  updateSummary();
+}
+
+function selectPayment(el, method) {
+  document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  state.paymentMethod = method;
+  const names = {qris:'QRIS',bca:'BCA VA',mandiri:'Mandiri VA',gopay:'GoPay',dana:'DANA'};
+  document.getElementById('sum-method').textContent = names[method] || method;
+  updateSummary();
+}
+
+function updateSummary() {
+  const g = state.selectedGame;
+  const n = state.selectedNominal;
+  const uid = document.getElementById('game-user-id')?.value || '—';
+  document.getElementById('sum-uid').textContent   = uid || '—';
+  document.getElementById('sum-uname').textContent = state.gameUsername || '—';
+  document.getElementById('sum-item').textContent  = n ? `${n.currency} ${n.amount}` : '—';
+  document.getElementById('sum-price').textContent = n ? fmtPrice(n.price) : '—';
+
+  if (n) {
+    let total = n.price;
+    if (state.promoApplied) {
+      const p = state.promoApplied;
+      const disc = p.type === 'percent' ? Math.round(n.price * p.value / 100) : p.value;
+      total = Math.max(0, total - disc);
+      document.getElementById('sum-discount').textContent = '-' + fmtPrice(disc);
+      document.getElementById('sum-discount-row').style.display = 'flex';
+    } else {
+      document.getElementById('sum-discount-row').style.display = 'none';
+    }
+    document.getElementById('sum-total').textContent = fmtPrice(total);
+  } else {
+    document.getElementById('sum-total').textContent = '—';
+  }
+}
+
+function resetIdVerify() {
+  document.getElementById('verified-chip').classList.remove('show');
+  document.getElementById('id-error').classList.remove('show');
+  state.gameUsername = '';
+  document.getElementById('sum-uname').textContent = '—';
+  updateSummary();
+}
+
+const FAKE_USERS = {
+  '12345678':  'DragonSlayer99',
+  '87654321':  'NightOwl_',
+  '11111111':  'ProGamer2024',
+  '99999999':  'Legend_Hunter',
+};
+
+function verifyGameId() {
+  const uid = document.getElementById('game-user-id').value.trim();
+  if (!uid) { showToast('Masukkan User ID terlebih dahulu'); return; }
+
+  const btn = document.querySelector('.id-verify-row button');
+  btn.textContent = '⏳'; btn.disabled = true;
+
+  setTimeout(() => {
+    btn.textContent = 'Cek ID'; btn.disabled = false;
+    const uname = FAKE_USERS[uid] || (uid.length >= 6 ? 'Player_' + uid.slice(-4) : null);
+    if (uname) {
+      state.gameUserId   = uid;
+      state.gameUsername = uname;
+      document.getElementById('verified-name').textContent = uname;
+      document.getElementById('verified-chip').classList.add('show');
+      document.getElementById('id-error').classList.remove('show');
+      document.getElementById('game-user-id').classList.remove('error');
+      document.getElementById('sum-uid').textContent   = uid;
+      document.getElementById('sum-uname').textContent = uname;
+      showToast('✅ ID valid: ' + uname, 'success');
+    } else {
+      document.getElementById('id-error').classList.add('show');
+      document.getElementById('game-user-id').classList.add('error');
+      document.getElementById('verified-chip').classList.remove('show');
+      showToast('❌ ID tidak ditemukan', 'danger');
+    }
+    updateSummary();
+  }, 1200);
+}
+
+function applyPromo() {
+  const code = document.getElementById('promo-input').value.trim().toUpperCase();
+  const st = document.getElementById('promo-status');
+
+  if (!code) { showToast('Masukkan kode promo'); return; }
+  if (!state.selectedNominal) { showToast('Pilih nominal terlebih dahulu'); return; }
+
+  const promo = PROMO_CODES[code];
+  if (promo) {
+    state.promoApplied = promo;
+    st.textContent = '✅ Promo "' + promo.label + '" berhasil diterapkan!';
+    st.className = 'promo-status success';
+    showToast('🎉 ' + promo.label, 'success');
+  } else {
+    state.promoApplied = null;
+    st.textContent = '❌ Kode promo tidak valid atau sudah kadaluarsa.';
+    st.className = 'promo-status error';
+  }
+  updateSummary();
+}
+
+function doCheckout() {
+  const uid = document.getElementById('game-user-id').value.trim();
+  if (!uid || !state.gameUsername) {
+    showToast('Verifikasi User ID terlebih dahulu'); return;
+  }
+  if (!state.selectedNominal) {
+    showToast('Pilih nominal yang ingin dibeli'); return;
+  }
+  if (!state.paymentMethod) {
+    showToast('Pilih metode pembayaran'); return;
+  }
+
+  state.orderId = genOrderId();
+  state.gameUserId = uid;
+
+  // Calculate total
+  let total = state.selectedNominal.price;
+  if (state.promoApplied) {
+    const disc = state.promoApplied.type === 'percent'
+      ? Math.round(total * state.promoApplied.value / 100)
+      : state.promoApplied.value;
+    total = Math.max(0, total - disc);
+  }
+  state.finalTotal = total;
+
+  loadPaymentPage();
+  goTo('page-payment');
+  startCountdown();
+}
+
+/* ════════════════ PAYMENT PAGE ════════════════ */
+function loadPaymentPage() {
+  const isQRIS = state.paymentMethod === 'qris' || state.paymentMethod === 'gopay' || state.paymentMethod === 'dana';
+  const methodNames = {qris:'QRIS',bca:'BCA Virtual Account',mandiri:'Mandiri Virtual Account',gopay:'GoPay',dana:'DANA'};
+
+  document.getElementById('pay-method-title').textContent = isQRIS ? 'Scan QRIS' : methodNames[state.paymentMethod];
+  document.getElementById('pay-total-display').textContent = fmtPrice(state.finalTotal);
+  document.getElementById('pay-order-id').textContent = state.orderId;
+  document.getElementById('pay-game').textContent = state.selectedGame.name;
+  document.getElementById('pay-item').textContent = `${state.selectedNominal.currency} ${state.selectedNominal.amount}`;
+
+  document.getElementById('qris-section').style.display = isQRIS ? 'block' : 'none';
+  document.getElementById('va-section').style.display   = isQRIS ? 'none' : 'block';
+
+  if (!isQRIS) {
+    const vaPrefix = { bca:'1234', mandiri:'8834' };
+    const prefix = vaPrefix[state.paymentMethod] || '9999';
+    document.getElementById('va-number-display').textContent =
+      prefix + ' ' + Math.floor(Math.random()*9000+1000) + ' ' + Math.floor(Math.random()*9000+1000);
+  }
+}
+
+function copyVA() {
+  const va = document.getElementById('va-number-display').textContent.replace(/\s/g,'');
+  navigator.clipboard?.writeText(va).catch(()=>{});
+  showToast('Nomor VA disalin!', 'success');
+}
+
+function startCountdown() {
+  let seconds = 15 * 60;
+  clearInterval(state.countdown);
+  state.countdown = setInterval(() => {
+    seconds--;
+    const m = Math.floor(seconds / 60).toString().padStart(2,'0');
+    const s = (seconds % 60).toString().padStart(2,'0');
+    const el = document.getElementById('countdown');
+    if (el) el.textContent = m + ':' + s;
+    if (seconds <= 0) {
+      clearInterval(state.countdown);
+      simulatePayment(false);
+    }
+  }, 1000);
+}
+
+function simulatePayment(success) {
+  clearInterval(state.countdown);
+  if (success) {
+    goTo('page-processing');
+    runProcessingSteps();
+  } else {
+    saveOrder(false);
+    goTo('page-failed');
+  }
+}
+
+function runProcessingSteps() {
+  const steps = ['proc-step1','proc-step2','proc-step3'];
+  const msgs  = [
+    '✅ Konfirmasi pembayaran diterima!',
+    '✅ Server game merespons...',
+    '✅ Item berhasil diinjeksi ke akun!'
+  ];
+  let i = 0;
+  const run = () => {
+    if (i < steps.length) {
+      document.getElementById(steps[i]).textContent = msgs[i];
+      if (i > 0) document.getElementById(steps[i]).style.opacity = '1';
+      i++;
+      setTimeout(run, 1000);
+    } else {
+      saveOrder(true);
+      setTimeout(() => {
+        loadSuccessPage();
+        goTo('page-success');
+      }, 500);
+    }
+  };
+  setTimeout(run, 800);
+}
+
+function loadSuccessPage() {
+  document.getElementById('suc-order-id').textContent = state.orderId;
+  document.getElementById('suc-game').textContent     = state.selectedGame.name;
+  document.getElementById('suc-uid').textContent      = state.gameUserId;
+  document.getElementById('suc-uname').textContent    = state.gameUsername;
+  document.getElementById('suc-item').textContent     = `${state.selectedNominal.currency} ${state.selectedNominal.amount}`;
+  document.getElementById('suc-total').textContent    = fmtPrice(state.finalTotal);
+  const names = {qris:'QRIS',bca:'BCA VA',mandiri:'Mandiri VA',gopay:'GoPay',dana:'DANA'};
+  document.getElementById('suc-method').textContent   = names[state.paymentMethod] || state.paymentMethod;
+}
+
+function downloadInvoice() {
+  showToast('📄 Invoice sedang dibuat...', 'success');
+  setTimeout(() => showToast('✅ Invoice berhasil diunduh!', 'success'), 1500);
+}
+
+function retryTopup() {
+  goTo('page-topup');
+}
+
+/* ════════════════ ORDERS ════════════════ */
+function saveOrder(success) {
+  const order = {
+    id: state.orderId,
+    game: state.selectedGame.name,
+    icon: state.selectedGame.icon,
+    item: `${state.selectedNominal.currency} ${state.selectedNominal.amount}`,
+    uid:  state.gameUserId,
+    uname: state.gameUsername,
+    total: state.finalTotal,
+    method: state.paymentMethod,
+    success,
+    date: new Date().toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'}),
+    time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}),
+  };
+  state.orders.unshift(order);
+}
+
+function loadOrders() {
+  state.orders = [
+    { id:'#GV192837', game:'Mobile Legends', icon:'⚔️', item:'💎 514', uid:'12345678', uname:'DragonSlayer99', total:108000, method:'qris', success:true, date:'10 Jun 2025', time:'14:22' },
+    { id:'#GV192651', game:'Free Fire',       icon:'🔥', item:'💎 355', uid:'87654321', uname:'NightOwl_',     total:52000,  method:'gopay', success:true, date:'05 Jun 2025', time:'09:10' },
+    { id:'#GV191200', game:'PUBG Mobile',     icon:'🎯', item:'🪙 325 UC',uid:'12345678',uname:'DragonSlayer99',total:69000, method:'bca',   success:false, date:'01 Jun 2025', time:'21:05' },
+  ];
+}
+
+function goToHistory() {
+  renderHistory();
+  goTo('page-history');
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  if (!state.orders.length) {
+    list.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:3rem">Belum ada pesanan</div>';
+    return;
+  }
+  list.innerHTML = state.orders.map(o => `
+    <div class="order-item">
+      <div class="order-icon">${o.icon}</div>
+      <div class="order-info">
+        <div class="order-game">${o.game}</div>
+        <div class="order-desc">${o.item} · ${o.uid} (${o.uname})</div>
+        <div style="margin-top:4px">${o.success
+          ? '<span class="badge badge-success">✓ Berhasil</span>'
+          : '<span class="badge badge-danger">✗ Gagal</span>'}
+          <span style="font-size:0.72rem; color:var(--text-dim); margin-left:6px">${o.id}</span>
+        </div>
+      </div>
+      <div class="order-meta">
+        <div class="order-price">${fmtPrice(o.total)}</div>
+        <div class="order-date">${o.date} ${o.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ════════════════ INIT ════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('page-login').classList.add('active');
+});
+</script>
+</body>
+</html>
