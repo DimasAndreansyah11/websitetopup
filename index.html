@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EliteZone - Top Up Game Premium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Latar belakang putih/abu sangat muda */
+            color: #1e293b;
+            overflow-x: hidden; /* Tambahan untuk mencegah scroll horizontal dari efek */
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .hide { display: none !important; }
+        
+        /* Animasi Transisi Halus */
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- TAMBAHAN EFEK BARU MULAI DARI SINI --- */
+        
+        /* Efek Melayang (Floating) */
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(12deg); }
+            50% { transform: translateY(-20px) rotate(15deg); }
+            100% { transform: translateY(0px) rotate(12deg); }
+        }
+
+        /* Efek Glow Berdenyut (Pulse Glow) */
+        .animate-glow {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 10px -2px rgba(37, 99, 235, 0.4); }
+            to { box-shadow: 0 0 25px 8px rgba(37, 99, 235, 0.7); }
+        }
+
+        /* Efek Teks Shimmer */
+        .shimmer-text {
+            background: linear-gradient(90deg, #bfdbfe 0%, #ffffff 50%, #bfdbfe 100%);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shimmer 2.5s linear infinite;
+        }
+        @keyframes shimmer {
+            to { background-position: 200% center; }
+        }
+
+        /* Latar Belakang Gradient Dinamis */
+        .bg-animated-gradient {
+            background: linear-gradient(-45deg, #2563eb, #1e3a8a, #3b82f6, #1d4ed8);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Hover Gambar Game Glow Soft Gold */
+        .hover-gold-glow:hover {
+            box-shadow: 0 0 15px rgba(250, 204, 21, 0.5);
+            border-color: rgba(250, 204, 21, 0.8);
+        }
+        /* --- TAMBAHAN EFEK BARU SELESAI --- */
+    </style>
+</head>
+<body class="selection:bg-blue-500/30 pb-20">
+
+    <nav class="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center cursor-pointer group" onclick="goHome()">
+                    <div class="bg-blue-600 p-1.5 rounded-lg mr-2 group-hover:bg-blue-700 transition-colors">
+                        <i data-lucide="gamepad-2" class="h-6 w-6 text-white group-hover:rotate-12 transition-transform"></i>
+                    </div>
+                    <span class="text-xl font-extrabold text-blue-600 tracking-tight">
+                        EliteZone
+                    </span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-6 flex-1 justify-end">
+                    <div class="relative w-64 lg:w-80 group">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 group-focus-within:text-blue-500 transition-colors"></i>
+                        <input type="text" id="search-desktop" oninput="handleSearch(this.value)" placeholder="Cari game favoritmu..." class="w-full bg-gray-50 border border-gray-300 text-sm rounded-full pl-10 pr-4 py-2 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800 transition-all">
+                    </div>
+                    
+                    <button onclick="switchView('track')" class="text-gray-600 hover:text-blue-600 font-medium transition-colors flex items-center">
+                        <i data-lucide="receipt" class="w-4 h-4 mr-1.5"></i> Cek Pesanan
+                    </button>
+                    
+                    <div id="auth-container">
+                        <button onclick="openLoginModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full font-semibold flex items-center transition-all shadow-sm shadow-blue-500/30 hover:shadow-blue-500/50">
+                            <i data-lucide="log-in" class="h-4 w-4 mr-2"></i>
+                            Masuk / Daftar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="md:hidden flex items-center gap-4">
+                    <div id="mobile-auth-container"></div>
+                    <button onclick="toggleMobileMenu()" class="text-gray-600 hover:text-blue-600 transition-colors">
+                        <i data-lucide="menu" id="menu-icon" class="h-6 w-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-200 p-4 space-y-4 shadow-lg absolute w-full left-0 z-50">
+            <div class="relative w-full focus-within:text-blue-500">
+                <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                <input type="text" id="search-mobile" oninput="handleSearch(this.value)" placeholder="Cari game..." class="w-full bg-gray-50 border border-gray-300 text-sm rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800 transition-all">
+            </div>
+            <button onclick="switchView('track'); toggleMobileMenu();" class="w-full text-left text-gray-600 hover:text-blue-600 py-2 flex items-center font-medium transition-colors">
+                <i data-lucide="receipt" class="w-4 h-4 mr-2"></i> Cek Pesanan
+            </button>
+            <div id="mobile-auth-action">
+                <button onclick="openLoginModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-3 rounded-lg flex items-center justify-center transition-colors shadow-md">
+                    <i data-lucide="log-in" class="h-4 w-4 mr-2"></i> Masuk / Daftar
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div id="view-home" class="space-y-10 fade-in">
+            <div class="relative rounded-3xl overflow-hidden bg-blue-600 shadow-xl border border-blue-500 flex flex-col md:flex-row items-center justify-between min-h-[300px] bg-animated-gradient">
+                
+                <canvas id="hero-particles" class="absolute inset-0 z-0 opacity-80 pointer-events-auto"></canvas>
+
+                <div class="absolute inset-0 opacity-20 pointer-events-none">
+                    <svg class="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <path d="M0,0 L100,0 L100,100 Z" fill="#ffffff"></path>
+                    </svg>
+                </div>
+                
+                <div class="relative z-10 p-8 sm:p-12 max-w-2xl text-left pointer-events-none">
+                    <span class="inline-block bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-4 uppercase tracking-wider shadow-sm border border-blue-400/50">Platform Top-Up Terpercaya</span>
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight mb-4 drop-shadow-md">
+                        Lebih Cepat, Lebih Aman, <br/>
+                        <span class="text-blue-200 shimmer-text">Anti Ribet!</span>
+                    </h1>
+                    <p class="text-blue-100 text-base md:text-lg mb-8 max-w-lg drop-shadow">
+                        Lengkapi kebutuhan gaming Anda dalam hitungan detik. Tanpa wajib login, langsung proses 24/7 dengan berbagai metode pembayaran.
+                    </p>
+                    <button style="pointer-events: auto;" onclick="document.getElementById('games-section').scrollIntoView({behavior: 'smooth'})" class="bg-white text-blue-600 font-bold px-8 py-3 rounded-full hover:bg-blue-50 transition-transform transform hover:scale-105 shadow-lg flex items-center gap-2">
+                        Mulai Top-Up <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                
+                <div class="relative z-10 hidden md:flex w-1/3 justify-center items-center p-8 pointer-events-none">
+                    <i data-lucide="gamepad-2" class="w-48 h-48 text-white/90 drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] transform rotate-12 animate-float"></i>
+                </div>
+            </div>
+
+            <div id="games-section" class="pt-4">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                        <span class="w-2 h-8 bg-blue-600 rounded-full mr-3"></span> Game Populer
+                    </h2>
+                </div>
+                <div id="games-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+                    </div>
+            </div>
+        </div>
+
+        <div id="view-detail" class="hide fade-in">
+            <button onclick="goHome()" class="flex items-center text-gray-500 hover:text-blue-600 mb-6 font-medium transition-all hover:-translate-x-1 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200 w-max">
+                <i data-lucide="arrow-left" class="h-4 w-4 mr-2"></i> Kembali
+            </button>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+                <div class="lg:col-span-1">
+                    <div class="bg-white border border-gray-200 rounded-2xl p-6 lg:sticky lg:top-24 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex flex-col items-center text-center">
+                            <img id="detail-game-img" src="" alt="Game" class="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl shadow-lg mb-4 object-cover border-4 border-white ring-1 ring-gray-100 transform hover:scale-105 transition-transform duration-300">
+                            <h1 id="detail-game-name" class="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Nama Game</h1>
+                            <p id="detail-game-pub" class="text-blue-600 text-sm font-medium mb-6">Publisher</p>
+                        </div>
+                        
+                        <div class="space-y-3 text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                            <p class="flex items-start"><i data-lucide="shield-check" class="h-4 w-4 text-blue-500 mr-2 mt-0.5 shrink-0"></i> Transaksi Aman 100%</p>
+                            <p class="flex items-start"><i data-lucide="zap" class="h-4 w-4 text-amber-500 mr-2 mt-0.5 shrink-0"></i> Proses Detik Langsung Masuk</p>
+                            <p class="flex items-start"><i data-lucide="headphones" class="h-4 w-4 text-blue-500 mr-2 mt-0.5 shrink-0"></i> Layanan Bantuan 24 Jam</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 space-y-6">
+                    <div id="error-banner" class="hide bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl flex items-center shadow-sm transition-all">
+                        <i data-lucide="alert-circle" class="h-5 w-5 mr-3 shrink-0 animate-pulse"></i>
+                        <p id="error-text" class="text-sm font-medium"></p>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center mb-5 border-b border-gray-100 pb-4">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3 border border-blue-200">1</div>
+                            <h2 class="text-lg font-bold text-gray-800">Masukkan Data Akun</h2>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">User ID / Player ID <span class="text-red-500">*</span></label>
+                                <input type="text" id="input-game-id" placeholder="Ketikan User ID" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800 transition-all shadow-inner">
+                            </div>
+                            <div id="zone-id-container" class="hide">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Zone ID / Server <span class="text-red-500">*</span></label>
+                                <input type="text" id="input-zone-id" placeholder="Ketikan Zone ID" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800 transition-all shadow-inner">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center mb-5 border-b border-gray-100 pb-4">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3 border border-blue-200">2</div>
+                            <h2 class="text-lg font-bold text-gray-800">Pilih Nominal</h2>
+                        </div>
+                        <div id="nominals-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                            </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center mb-5 border-b border-gray-100 pb-4">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3 border border-blue-200">3</div>
+                            <h2 class="text-lg font-bold text-gray-800">Nomor WhatsApp</h2>
+                        </div>
+                        <p class="text-sm text-gray-500 mb-4">Invoice dan status pesanan akan dikirim ke nomor ini.</p>
+                        <div class="relative group">
+                            <i data-lucide="smartphone" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 group-focus-within:text-blue-500 transition-colors"></i>
+                            <input type="tel" id="input-phone" placeholder="Contoh: 081234567890" class="w-full bg-gray-50 border border-gray-300 rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800 transition-all shadow-inner">
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center mb-5 border-b border-gray-100 pb-4">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3 border border-blue-200">4</div>
+                            <h2 class="text-lg font-bold text-gray-800">Metode Pembayaran</h2>
+                        </div>
+                        <div id="payments-list" class="space-y-3">
+                            </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Kode Promo (Opsional)</label>
+                            <div class="flex gap-2">
+                                <div class="relative flex-1 group">
+                                    <i data-lucide="ticket" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 group-focus-within:text-blue-500 transition-colors"></i>
+                                    <input type="text" id="input-promo" placeholder="Masukkan kode promo" class="w-full bg-gray-50 border border-gray-300 rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800 uppercase transition-all shadow-inner">
+                                </div>
+                                <button id="btn-apply-promo" onclick="applyPromo()" class="bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-bold transition-all transform active:scale-95">Terapkan</button>
+                            </div>
+                            <p id="promo-msg" class="text-sm mt-2 font-semibold hide transition-opacity"></p>
+                        </div>
+
+                        <div class="border-t border-gray-100 pt-6">
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 bg-blue-50 p-4 rounded-xl border border-blue-100 gap-4 transition-all">
+                                <span class="text-gray-700 font-medium w-full sm:w-auto">Total Pembayaran:</span>
+                                <span id="total-price" class="text-2xl font-black text-blue-600 w-full sm:w-auto sm:text-right flex items-center justify-end">Rp 0</span>
+                            </div>
+                            <button id="btn-checkout" onclick="handleCheckout()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-4 rounded-xl transition-all transform active:scale-95 animate-glow flex justify-center items-center">
+                                Beli Sekarang
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div id="view-payment" class="hide max-w-lg mx-auto py-4 fade-in">
+            <div class="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-xl">
+                <div class="bg-blue-600 p-6 text-center relative bg-animated-gradient">
+                    <button onclick="cancelPayment()" class="absolute left-4 top-6 text-blue-200 hover:text-white transition-colors">
+                        <i data-lucide="arrow-left" class="h-6 w-6 transform hover:-translate-x-1 transition-transform"></i>
+                    </button>
+                    <h2 class="text-lg font-bold text-white mb-1">Selesaikan Pembayaran</h2>
+                    <div class="text-xs text-blue-100 font-mono mb-2">No. Invoice: <span id="payment-invoice-id" class="font-bold text-yellow-300"></span></div>
+                    <div class="inline-flex items-center justify-center bg-white/20 px-3 py-1 rounded-full text-white font-medium text-sm backdrop-blur-sm border border-white/30">
+                        <i data-lucide="clock" class="w-4 h-4 mr-1.5 animate-pulse"></i> Sisa waktu: <span id="payment-timer" class="ml-1">14:59</span>
+                    </div>
+                </div>
+                
+                <div class="p-6 md:p-8">
+                    <div class="text-center mb-6">
+                        <p class="text-gray-500 text-sm mb-1 font-medium">Total Tagihan</p>
+                        <p id="pay-amount" class="text-3xl font-black text-blue-600">Rp 0</p>
+                    </div>
+
+                    <div class="flex items-center justify-center mb-8 p-3 bg-gray-50 border border-gray-200 rounded-xl hover:shadow-sm transition-shadow">
+                        <img id="pay-method-logo" src="" alt="Brand Logo" class="h-8 max-w-[120px] object-contain mr-3 hide">
+                        <span id="pay-method-name" class="font-bold text-gray-800">QRIS</span>
+                    </div>
+
+                    <div id="qris-container" class="hide text-center flex flex-col items-center justify-center">
+                        <div class="bg-white p-3 rounded-2xl inline-block mb-4 shadow-md border border-gray-200 transform hover:scale-105 transition-transform">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=EliteZone_DummyPayment_QRIS" alt="QRIS Code" class="w-48 h-48 rounded-lg">
+                        </div>
+                        <p class="text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-200">Silakan scan QR Code di atas menggunakan aplikasi E-Wallet (GoPay, OVO, DANA) atau Mobile Banking Anda.</p>
+                    </div>
+
+                    <div id="va-container" class="hide">
+                        <p class="text-gray-500 text-sm mb-2 text-center font-medium">Nomor Virtual Account</p>
+                        <div class="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4 shadow-inner">
+                            <span id="va-number" class="text-xl font-bold text-blue-700 tracking-wider">8077 1234 5678 9012</span>
+                            <button id="btn-copy-va" onclick="copyVA()" class="text-blue-600 hover:text-white hover:bg-blue-600 flex items-center text-sm font-bold bg-white px-3 py-1.5 rounded-lg border border-blue-200 transition-all active:scale-95">
+                                <i data-lucide="copy" class="h-4 w-4 mr-1"></i> Salin
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-600 text-center">Gunakan ATM atau Mobile Banking untuk transfer ke nomor Virtual Account di atas.</p>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-gray-100">
+                        <button id="btn-check-payment" onclick="goToHomeFromPayment()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-xl flex justify-center items-center transition-all shadow-md shadow-orange-500/20 active:scale-95">
+                            <i data-lucide="clock" class="h-5 w-5 mr-2 animate-spin-slow"></i> Menunggu Pembayaran
+                        </button>
+                        <button onclick="cancelPayment()" class="w-full mt-3 bg-white text-gray-500 hover:bg-gray-50 hover:text-red-500 border border-gray-200 font-semibold py-3 rounded-xl transition-all">
+                            Batalkan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-invoice" class="hide max-w-2xl mx-auto py-4 fade-in">
+            <div class="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-xl">
+                <div class="bg-green-50 p-8 text-center border-b border-green-100">
+                    <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg shadow-green-500/30 transform hover:scale-110 transition-transform">
+                        <i data-lucide="check" class="h-10 w-10 text-white font-bold animate-bounce"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-1">Pembayaran Berhasil!</h2>
+                    <p class="text-green-700 text-sm font-medium">Pesanan Anda sedang diproses dan akan segera masuk.</p>
+                </div>
+                
+                <div class="p-6 sm:p-8">
+                    <h3 class="font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2">Rincian Transaksi</h3>
+                    <div class="space-y-4 mb-8 text-sm sm:text-base text-gray-600">
+                        <div class="flex justify-between hover:bg-gray-50 p-1 rounded transition-colors">
+                            <span>Order ID</span>
+                            <span id="inv-order" class="font-bold text-gray-900"></span>
+                        </div>
+                        <div class="flex justify-between hover:bg-gray-50 p-1 rounded transition-colors">
+                            <span>Waktu</span>
+                            <span id="inv-date" class="font-medium text-gray-900"></span>
+                        </div>
+                        <div class="flex justify-between hover:bg-gray-50 p-1 rounded transition-colors">
+                            <span>Game</span>
+                            <span id="inv-game" class="font-bold text-blue-600"></span>
+                        </div>
+                        <div class="flex justify-between hover:bg-gray-50 p-1 rounded transition-colors">
+                            <span>User ID / Zone ID</span>
+                            <span id="inv-userid" class="font-bold text-gray-900"></span>
+                        </div>
+                        <div class="flex justify-between hover:bg-gray-50 p-1 rounded transition-colors">
+                            <span>Nickname</span>
+                            <span id="inv-username" class="font-bold text-gray-900 bg-gray-100 px-2 rounded"></span>
+                        </div>
+                        <div class="flex justify-between hover:bg-gray-50 p-1 rounded transition-colors">
+                            <span>Item</span>
+                            <span id="inv-item" class="font-medium text-gray-900"></span>
+                        </div>
+                        <div class="flex justify-between border-b border-gray-100 pb-4 hover:bg-gray-50 p-1 rounded transition-colors">
+                            <span>Metode Pembayaran</span>
+                            <span id="inv-payment" class="font-medium text-gray-900"></span>
+                        </div>
+                        <div class="flex justify-between pt-2">
+                            <span class="text-gray-800 font-bold text-lg">Total Dibayar</span>
+                            <span id="inv-total" class="font-black text-blue-600 text-xl"></span>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 rounded-xl p-4 mb-8 flex items-start border border-blue-100 hover:shadow-md transition-shadow">
+                        <i data-lucide="info" class="h-5 w-5 text-blue-500 mr-3 shrink-0 mt-0.5"></i>
+                        <p class="text-sm text-gray-700 leading-relaxed">
+                            Bukti transaksi telah dikirimkan ke WhatsApp <span id="inv-phone" class="font-bold text-gray-900"></span>. Harap simpan Order ID jika butuh bantuan Customer Service.
+                        </p>
+                    </div>
+
+                    <button onclick="goHome()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-4 rounded-xl transition-all shadow-md active:scale-95 hover:shadow-lg">
+                        Kembali ke Beranda
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-track" class="hide max-w-2xl mx-auto py-8 fade-in">
+            <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-10 shadow-xl hover:shadow-2xl transition-shadow">
+                <div class="text-center mb-8">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transform hover:scale-110 transition-transform">
+                        <i data-lucide="search" class="w-8 h-8 text-blue-600"></i>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Lacak Pesanan</h2>
+                    <p class="text-gray-500">Masukkan Nomor Invoice atau Nomor WhatsApp Anda untuk mengecek status pesanan.</p>
+                </div>
+
+                <form onsubmit="processTrack(event)" class="space-y-4 mb-8">
+                    <div class="group">
+                        <input type="text" id="track-input" required placeholder="Contoh: INV-ABCD123 atau 08123456789" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800 text-lg transition-all shadow-inner text-center font-medium placeholder:font-normal group-hover:border-blue-300">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-4 rounded-xl transition-all shadow-md shadow-blue-500/30 flex justify-center items-center active:scale-95">
+                        Cek Sekarang
+                    </button>
+                </form>
+
+                <div id="track-result" class="hide bg-gray-50 border border-gray-200 rounded-2xl p-0 transition-all duration-500">
+                    </div>
+            </div>
+        </div>
+
+        <div id="view-tnc" class="hide max-w-4xl mx-auto py-8 fade-in">
+            <div class="bg-white border border-gray-200 rounded-3xl p-8 md:p-12 shadow-sm">
+                <button onclick="goHome()" class="flex items-center text-gray-500 hover:text-blue-600 mb-6 font-medium transition-all hover:-translate-x-1 bg-gray-50 px-4 py-2 rounded-full border border-gray-200 w-max">
+                    <i data-lucide="arrow-left" class="h-4 w-4 mr-2"></i> Kembali
+                </button>
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-6">Syarat & Ketentuan</h2>
+                <div class="space-y-6 text-gray-600 leading-relaxed text-sm md:text-base">
+                    <div class="hover:bg-gray-50 p-4 rounded-xl transition-colors border border-transparent hover:border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">1. Ketentuan Umum</h3>
+                        <p>Dengan accessing and using EliteZone services, you agree to be bound by these Terms and Conditions. If you do not agree, please do not use our services.</p>
+                    </div>
+                    <div class="hover:bg-gray-50 p-4 rounded-xl transition-colors border border-transparent hover:border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">2. Transaksi dan Pembayaran</h3>
+                        <p>Pastikan User ID dan Server ID yang Anda masukkan sudah benar. Kesalahan input sepenuhnya menjadi tanggung jawab pembeli. EliteZone tidak akan memberikan pengembalian dana (refund) atas kelalaian pembeli. Pembayaran harus dilakukan sesuai dengan nominal dan metode yang telah dipilih sebelum batas waktu habis.</p>
+                    </div>
+                    <div class="hover:bg-gray-50 p-4 rounded-xl transition-colors border border-transparent hover:border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">3. Waktu Proses</h3>
+                        <p>Proses top-up umumnya membutuhkan waktu 1-5 menit. Pada kondisi tertentu (seperti gangguan dari server game pusat), proses dapat memakan waktu hingga 24 jam. Kami berkomitmen untuk menyelesaikan pesanan Anda secepat mungkin.</p>
+                    </div>
+                    <div class="hover:bg-gray-50 p-4 rounded-xl transition-colors border border-transparent hover:border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">4. Kebijakan Pengembalian Dana (Refund)</h3>
+                        <p>Refund hanya akan dilakukan jika pesanan gagal diproses oleh sistem karena stok kosong atau gangguan server yang berkepanjangan, dan dana sudah masuk ke rekening kami.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-privacy" class="hide max-w-4xl mx-auto py-8 fade-in">
+            <div class="bg-white border border-gray-200 rounded-3xl p-8 md:p-12 shadow-sm">
+                <button onclick="goHome()" class="flex items-center text-gray-500 hover:text-blue-600 mb-6 font-medium transition-all hover:-translate-x-1 bg-gray-50 px-4 py-2 rounded-full border border-gray-200 w-max">
+                    <i data-lucide="arrow-left" class="h-4 w-4 mr-2"></i> Kembali
+                </button>
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-6">Kebijakan Privasi</h2>
+                <div class="space-y-6 text-gray-600 leading-relaxed text-sm md:text-base">
+                    <div class="hover:bg-gray-50 p-4 rounded-xl transition-colors border border-transparent hover:border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">1. Pengumpulan Informasi</h3>
+                        <p>Kami mengumpulkan informasi yang Anda berikan secara langsung kepada kami, seperti Nomor WhatsApp, User ID Game, dan Nama Lengkap (jika mendaftar akun). Informasi ini digunakan semata-mata untuk memproses transaksi dan mengirimkan bukti pembelian (invoice).</p>
+                    </div>
+                    <div class="hover:bg-gray-50 p-4 rounded-xl transition-colors border border-transparent hover:border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">2. Penggunaan Informasi</h3>
+                        <p>Data yang kami kumpulkan akan digunakan untuk memverifikasi dan mengeksekusi pesanan top-up Anda, contacting you if terdapat kendala pesanan, serta untuk mencegah penipuan/aktivitas mencurigakan.</p>
+                    </div>
+                    <div class="hover:bg-gray-50 p-4 rounded-xl transition-colors border border-transparent hover:border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">3. Perlindungan Data</h3>
+                        <p>EliteZone berkomitmen melindungi data pribadi Anda. Kami tidak akan pernah menjual, menyewakan, atau membagikan nomor WhatsApp Anda kepada pihak ketiga untuk tujuan pemasaran tanpa izin Anda.</p>
+                    </div>
+                    <div class="hover:bg-gray-50 p-4 rounded-xl transition-colors border border-transparent hover:border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">4. Perubahan Kebijakan</h3>
+                        <p>Kami berhak untuk mengubah Kebijakan Privasi ini kapan saja. Perubahan akan langsung efektif setelah diunggah ke halaman ini. Anda dianjurkan untuk memeriksa halaman ini secara berkala.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="modal-promo" class="hide fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm fade-in transition-all">
+        <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl relative scale-100 transition-transform transform hover:scale-[1.02]">
+            <button onclick="closePromoModal()" class="absolute right-4 top-4 text-white bg-black/30 hover:bg-black/50 rounded-full p-1.5 transition-colors z-10 hover:rotate-90">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="relative h-48 sm:h-64 bg-blue-600 w-full flex flex-col items-center justify-center text-center p-6 overflow-hidden bg-animated-gradient">
+                <div class="absolute inset-0 opacity-20 pointer-events-none">
+                    <svg class="h-full w-full animate-pulse" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <path d="M0,100 C20,0 50,0 100,100 Z" fill="#ffffff"></path>
+                    </svg>
+                </div>
+                <span class="bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full mb-3 z-10 uppercase tracking-widest shadow-sm border border-yellow-300">Info Promo Spesial</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-white z-10 leading-tight drop-shadow-md shimmer-text">TOP UP MURAH <br> BONUS MELIMPAH</h2>
+            </div>
+            <div class="p-6 md:p-8 text-center">
+                <p class="text-gray-600 mb-6 font-medium">Gunakan kode promo <span class="text-blue-600 font-bold bg-blue-50 px-2 py-1 rounded border border-blue-100 select-all hover:bg-blue-100 transition-colors cursor-pointer">ELITEZONE50</span> saat checkout untuk mendapatkan potongan harga spesial di semua game!</p>
+                <button onclick="closePromoModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md shadow-blue-500/20 active:scale-95 animate-glow">
+                    Klaim Promo Sekarang
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-gray-200 pt-12 pb-8 mt-12 relative overflow-hidden">
+        <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 border-b border-gray-100 pb-8">
+                <div class="md:col-span-2">
+                    <div class="flex items-center mb-4 group cursor-pointer" onclick="goHome()">
+                        <div class="bg-blue-600 p-1.5 rounded-lg mr-2 group-hover:bg-blue-700 transition-colors">
+                            <i data-lucide="gamepad-2" class="h-6 w-6 text-white group-hover:rotate-12 transition-transform"></i>
+                        </div>
+                        <span class="text-xl font-extrabold text-gray-900 tracking-tight group-hover:text-blue-600 transition-colors">EliteZone</span>
+                    </div>
+                    <p class="text-gray-500 text-sm leading-relaxed mb-4 max-w-sm">
+                        EliteZone adalah platform top-up voucher game tercepat, termurah, dan terpercaya di Indonesia. Transaksi instan 24/7 tanpa ribet.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all transform hover:scale-110"><i data-lucide="instagram" class="w-4 h-4"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all transform hover:scale-110"><i data-lucide="facebook" class="w-4 h-4"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all transform hover:scale-110"><i data-lucide="twitter" class="w-4 h-4"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-4 uppercase tracking-wider text-sm">Navigasi</h4>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li><a href="javascript:void(0)" onclick="goHome()" class="hover:text-blue-600 transition-colors hover:translate-x-1 inline-block transform">Beranda</a></li>
+                        <li><a href="javascript:void(0)" onclick="switchView('track')" class="hover:text-blue-600 transition-colors hover:translate-x-1 inline-block transform">Cek Pesanan</a></li>
+                        <li><a href="javascript:void(0)" onclick="switchView('tnc')" class="hover:text-blue-600 transition-colors hover:translate-x-1 inline-block transform">Syarat & Ketentuan</a></li>
+                        <li><a href="javascript:void(0)" onclick="switchView('privacy')" class="hover:text-blue-600 transition-colors hover:translate-x-1 inline-block transform">Kebijakan Privasi</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-4 uppercase tracking-wider text-sm">Bantuan</h4>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center hover:text-blue-600 transition-colors cursor-pointer"><i data-lucide="headphones" class="w-4 h-4 mr-2 text-blue-500"></i> CS 24 Jam</li>
+                        <li class="flex items-center hover:text-blue-600 transition-colors cursor-pointer"><i data-lucide="mail" class="w-4 h-4 mr-2 text-blue-500"></i> support@elitezone.id</li>
+                        <li class="flex items-center hover:text-blue-600 transition-colors cursor-pointer"><i data-lucide="message-circle" class="w-4 h-4 mr-2 text-blue-500"></i> WA: 0812-3456-789</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+                <p>&copy; 2026 EliteZone. All rights reserved.</p>
+                <div class="flex items-center mt-6 md:mt-0 space-x-3">
+                    <span class="mr-2 text-gray-500 font-medium">Bantuan Cepat via:</span>
+                    <a href="https://wa.me/6281234567890?text=Halo%20Admin%20EliteZone,%20saya%20butuh%20bantuan%20terkait%20pesanan%20saya" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition-all transform hover:scale-105 border border-green-200">
+                        <i data-lucide="message-circle" class="w-4 h-4"></i>
+                        <span class="text-xs font-bold">WhatsApp</span>
+                    </a>
+                    <a href="mailto:support@elitezone.id?subject=Bantuan%20Kendala%20Top-Up%20EliteZone" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all transform hover:scale-105 border border-red-200">
+                        <i data-lucide="mail" class="w-4 h-4"></i>
+                        <span class="text-xs font-bold">Gmail</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="modal-login" class="hide fixed inset-0 z-[70] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm transition-opacity fade-in">
+        <div class="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative transform transition-all hover:scale-[1.01]">
+            <button onclick="closeLoginModal()" class="absolute right-4 top-4 text-gray-400 hover:text-gray-700 bg-gray-100 rounded-full p-1 transition-colors hover:rotate-90">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="p-8">
+                <div id="view-login" class="block fade-in">
+                    <div class="text-center mb-6">
+                        <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 transform transition-transform hover:scale-110">
+                            <i data-lucide="user" class="text-blue-600 w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-2xl font-black text-gray-900 mb-1">Masuk Akun</h3>
+                        <p class="text-sm text-gray-500">Belum punya akun? <a href="#" onclick="toggleAuthMode('register')" class="text-blue-600 font-bold hover:underline transition-colors">Daftar</a></p>
+                    </div>
+                    
+                    <form onsubmit="processAuth(event, 'login')" class="space-y-4">
+                        <div class="group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5 group-focus-within:text-blue-600 transition-colors">No. HP / WhatsApp</label>
+                            <input type="tel" id="login-email" required placeholder="081234567890" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-sm transition-all">
+                        </div>
+                        <div class="group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5 group-focus-within:text-blue-600 transition-colors">Password</label>
+                            <input type="password" id="login-password" required placeholder="Masukkan password" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-sm transition-all">
+                            <div class="text-right mt-2">
+                                <a href="#" class="text-xs text-blue-600 font-semibold hover:underline transition-colors">Lupa Password?</a>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-md shadow-blue-500/20 transition-all mt-4 active:scale-95">
+                            Masuk
+                        </button>
+                    </form>
+                </div>
+
+                <div id="view-register" class="hide fade-in">
+                    <div class="text-center mb-6">
+                        <h3 class="text-2xl font-black text-gray-900 mb-1">Daftar Baru</h3>
+                        <p class="text-sm text-gray-500">Sudah punya akun? <a href="#" onclick="toggleAuthMode('login')" class="text-blue-600 font-bold hover:underline transition-colors">Masuk</a></p>
+                    </div>
+                    
+                    <form onsubmit="processAuth(event, 'register')" class="space-y-4">
+                        <div class="group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5 group-focus-within:text-blue-600 transition-colors">Nama Lengkap</label>
+                            <input type="text" id="reg-name" required placeholder="Contoh: Budi Santoso" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-sm transition-all">
+                        </div>
+                        <div class="group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5 group-focus-within:text-blue-600 transition-colors">No. HP / WhatsApp</label>
+                            <input type="tel" id="reg-email" required placeholder="081234567890" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-sm transition-all">
+                        </div>
+                        <div class="group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5 group-focus-within:text-blue-600 transition-colors">Password</label>
+                            <input type="password" id="reg-password" required placeholder="Buat password minimal 6 karakter" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-sm transition-all">
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-md shadow-blue-500/20 transition-all mt-4 active:scale-95">
+                            Daftar Sekarang
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading-overlay" class="hide fixed inset-0 z-[80] flex items-center justify-center bg-white/80 backdrop-blur-sm fade-in">
+        <div class="flex flex-col items-center bg-white p-8 rounded-2xl shadow-2xl border border-blue-100 transform transition-transform scale-105">
+            <i data-lucide="loader-2" class="h-12 w-12 text-blue-600 animate-spin mb-4"></i>
+            <p class="text-blue-900 font-extrabold animate-pulse tracking-wide">Memproses...</p>
+        </div>
+    </div>
+
+    <div id="modal-confirm" class="hide fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm fade-in">
+        <div class="bg-white border border-gray-200 rounded-3xl max-w-sm w-full p-6 shadow-2xl scale-100 transition-transform transform hover:scale-[1.02]">
+            <h3 class="text-xl font-bold text-gray-900 mb-5 text-center flex items-center justify-center gap-2">
+                <i data-lucide="user-check" class="w-6 h-6 text-blue-600"></i> Konfirmasi Akun
+            </h3>
+            
+            <div class="bg-gray-50 border border-gray-200 rounded-2xl p-5 mb-6 space-y-3 shadow-inner">
+                <div class="flex justify-between items-center group">
+                    <span class="text-gray-500 text-sm group-hover:text-blue-500 transition-colors">Game</span>
+                    <span id="conf-game" class="font-bold text-gray-900 text-sm"></span>
+                </div>
+                <div class="flex justify-between items-center group">
+                    <span class="text-gray-500 text-sm group-hover:text-blue-500 transition-colors">ID Tujuan</span>
+                    <span id="conf-userid" class="font-bold text-gray-900 text-sm"></span>
+                </div>
+                <div class="flex justify-between items-center border-t border-gray-200 pt-3 mt-1 bg-blue-50/50 -mx-2 px-2 rounded">
+                    <span class="text-gray-500 text-sm">Nickname</span>
+                    <span id="conf-nickname" class="font-black text-blue-600 text-lg drop-shadow-sm"></span>
+                </div>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6 flex items-start hover:shadow-md transition-shadow">
+                <i data-lucide="info" class="w-5 h-5 text-blue-500 mr-2 shrink-0 animate-bounce"></i>
+                <p class="text-xs text-blue-800">
+                    Mohon pastikan Nickname di atas sudah sesuai dengan akun Anda.
+                </p>
+            </div>
+
+            <div class="flex space-x-3">
+                <button onclick="closeConfirmModal()" class="flex-1 bg-white border border-gray-300 hover:bg-gray-50 hover:text-red-500 text-gray-700 font-bold py-3.5 rounded-xl transition-all active:scale-95">
+                    Ubah Data
+                </button>
+                <button onclick="openPayment()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md shadow-blue-500/30 active:scale-95 animate-glow">
+                    Lanjut Bayar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA GAMES ---
+        const GAMES = [
+            { id: 'mlbb', name: 'Mobile Legends', image: 'Mobile Legends.png', hasZone: true, publisher: 'Moonton',
+              nominals: [
+                  { id: 'ml1', name: '86 Diamonds', price: 23000 },
+                  { id: 'ml2', name: '172 Diamonds', price: 46000 },
+                  { id: 'ml3', name: '257 Diamonds', price: 69000 },
+                  { id: 'ml4', name: '344 Diamonds', price: 92000 },
+                  { id: 'ml5', name: '706 Diamonds', price: 184000 },
+                  { id: 'ml6', name: '1050 Diamonds', price: 275000 },
+              ]
+            },
+            { id: 'pubgm', name: 'PUBG Mobile', image: 'PUBG Mobile.jpg', hasZone: false, publisher: 'Level Infinite',
+              nominals: [
+                  { id: 'pg1', name: '60 UC', price: 15000 },
+                  { id: 'pg2', name: '325 UC', price: 75000 },
+                  { id: 'pg3', name: '660 UC', price: 150000 },
+                  { id: 'pg4', name: '1800 UC', price: 400000 },
+                  { id: 'pg5', name: '3850 UC', price: 800000 },
+                  { id: 'pg6', name: '8100 UC', price: 1600000 },
+              ]
+            },
+            { id: 'ff', name: 'Free Fire', image: 'Free Fire.jpg', hasZone: false, publisher: 'Garena',
+              nominals: [
+                  { id: 'ff1', name: '70 Diamonds', price: 10000 },
+                  { id: 'ff2', name: '140 Diamonds', price: 20000 },
+                  { id: 'ff3', name: '355 Diamonds', price: 50000 },
+                  { id: 'ff4', name: '720 Diamonds', price: 100000 },
+                  { id: 'ff5', name: '1450 Diamonds', price: 200000 },
+                  { id: 'ff6', name: '2180 Diamonds', price: 300000 },
+              ]
+            },
+            { id: 'valo', name: 'Valorant', image: 'Valorant.jpg', hasZone: false, publisher: 'Riot Games',
+              nominals: [
+                  { id: 'vl1', name: '125 VP', price: 15000 },
+                  { id: 'vl2', name: '420 VP', price: 50000 },
+                  { id: 'vl3', name: '700 VP', price: 80000 },
+                  { id: 'vl4', name: '1375 VP', price: 150000 },
+                  { id: 'vl5', name: '2400 VP', price: 250000 },
+                  { id: 'vl6', name: '4000 VP', price: 400000 },
+              ]
+            },
+            { id: 'gi', name: 'Genshin Impact', image: 'Genshin Impact.png', hasZone: true, publisher: 'HoYoverse',
+              nominals: [
+                  { id: 'gi1', name: '60 Genesis Crystals', price: 16000 },
+                  { id: 'gi2', name: '300 Genesis Crystals', price: 79000 },
+                  { id: 'gi3', name: '980 Genesis Crystals', price: 249000 },
+                  { id: 'gi4', name: '1980 Genesis Crystals', price: 479000 },
+                  { id: 'gi5', name: '3280 Genesis Crystals', price: 799000 },
+                  { id: 'gi6', name: '6480 Genesis Crystals', price: 1599000 },
+              ]
+            },
+            { id: 'hsr', name: 'Honkai: Star Rail', image: 'Honkai Star Rail.jpg', hasZone: true, publisher: 'HoYoverse',
+              nominals: [
+                  { id: 'hs1', name: '60 Oneiric Shard', price: 16000 },
+                  { id: 'hs2', name: '300 Oneiric Shard', price: 79000 },
+                  { id: 'hs3', name: '980 Oneiric Shard', price: 249000 },
+                  { id: 'hs4', name: '1980 Oneiric Shard', price: 479000 },
+                  { id: 'hs5', name: '3280 Oneiric Shard', price: 799000 },
+                  { id: 'hs6', name: '6480 Oneiric Shard', price: 1599000 },
+              ]
+            },
+            { id: 'codm', name: 'Call of Duty', image: 'Call Of Duty.webp', hasZone: false, publisher: 'Activision',
+              nominals: [
+                  { id: 'co1', name: '31 CP', price: 5000 },
+                  { id: 'co2', name: '62 CP', price: 10000 },
+                  { id: 'co3', name: '127 CP', price: 20000 },
+                  { id: 'co4', name: '317 CP', price: 50000 },
+                  { id: 'co5', name: '634 CP', price: 100000 },
+                  { id: 'co6', name: '1373 CP', price: 200000 },
+              ]
+            },
+            { id: 'fc26', name: 'EA FC 26', image: 'FC26.jpg', hasZone: false, publisher: 'EA Sports',
+              nominals: [
+                  { id: 'fc1', name: '100 FC POINTS', price: 15000 },
+                  { id: 'fc2', name: '500 FC POINTS', price: 70000 },
+                  { id: 'fc3', name: '1050 FC POINTS', price: 140000 },
+                  { id: 'fc4', name: '1600 FC POINTS', price: 200000 },
+                  { id: 'fc5', name: '2800 FC POINTS', price: 350000 },
+                  { id: 'fc6', name: '5800 FC POINTS', price: 700000 },
+              ]
+            },
+        ];
+
+        // --- DATA PAYMENT METHODS DENGAN LOGO GAMBAR ---
+        const PAYMENT_METHODS = [
+            { id: 'qris', name: 'QRIS', fee: 'Gratis', feeAmount: 0, category: 'E-Wallet', type: 'qris', image: 'Qris.png' },
+            { id: 'gopay', name: 'GoPay', fee: 'Gratis', feeAmount: 0, category: 'E-Wallet', type: 'qris', image: 'Gopay.png' },
+            { id: 'dana', name: 'DANA', fee: 'Rp 500', feeAmount: 500, category: 'E-Wallet', type: 'qris', image: 'Dana.png' },
+            { id: 'bca', name: 'BCA Virtual Account', fee: 'Rp 4.000', feeAmount: 4000, category: 'Transfer Bank', type: 'va', image: 'BCA.png' },
+            { id: 'bni', name: 'BNI Virtual Account', fee: 'Rp 4.000', feeAmount: 4000, category: 'Transfer Bank', type: 'va', image: 'BNI.png' },
+        ];
+
+        // --- STATE ---
+        let currentView = 'home';
+        let selectedGame = null;
+        let selectedNominal = null;
+        let selectedPayment = null;
+        let validatedName = '';
+        let timerInterval;
+        let isLoggedIn = false;
+        
+        let finalTotal = 0;
+        let isPromoApplied = false;
+        let discountAmount = 0;
+
+        // DB Transaksi Lokal untuk Mendukung Fitur Cek Pesanan Dinamis
+        let currentInvoiceId = '';
+        const TRANSACTIONS_DB = {}; 
+
+        // --- INITIALIZE ---
+        window.onload = () => {
+            lucide.createIcons();
+            renderGames();
+            renderPaymentMethods();
+            initParticles(); // Memanggil efek interaktif partikel soft gold
+
+            // Memunculkan Pop-up Iklan setelah 800ms
+            setTimeout(() => {
+                document.getElementById('modal-promo').classList.remove('hide');
+            }, 800);
+        };
+
+        // --- TAMBAHAN JS: EFEK PARTIKEL INTERAKTIF PADA HERO BANNER ---
+        function initParticles() {
+            const canvas = document.getElementById('hero-particles');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let particles = [];
+            let mouse = { x: null, y: null };
+
+            function resize() {
+                width = canvas.parentElement.clientWidth;
+                height = canvas.parentElement.clientHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                mouse.x = e.clientX - rect.left;
+                mouse.y = e.clientY - rect.top;
+            });
+            canvas.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.size = Math.random() * 2 + 1;
+                    this.speedX = Math.random() * 1 - 0.5;
+                    this.speedY = Math.random() * 1 - 0.5;
+                    // Warna Soft Gold yang menyatu indah dengan Cyberpunk/Neo-Classic Blue
+                    this.color = `rgba(250, 204, 21, ${Math.random() * 0.5 + 0.1})`; 
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    if (this.x > width || this.x < 0) this.speedX *= -1;
+                    if (this.y > height || this.y < 0) this.speedY *= -1;
+
+                    // Interaksi partikel dengan mouse (Particle Trails)
+                    if (mouse.x != null) {
+                        let dx = mouse.x - this.x;
+                        let dy = mouse.y - this.y;
+                        let distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < 100) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(250, 204, 21, ${0.2 - distance/500})`;
+                            ctx.lineWidth = 1;
+                            ctx.moveTo(this.x, this.y);
+                            ctx.lineTo(mouse.x, mouse.y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            for (let i = 0; i < 60; i++) particles.push(new Particle());
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                particles.forEach(p => { p.update(); p.draw(); });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+        // --- AKHIR TAMBAHAN JS EFEK PARTIKEL ---
+
+        function closePromoModal() {
+            const modal = document.getElementById('modal-promo');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hide');
+                modal.classList.remove('opacity-0');
+            }, 300);
+        }
+
+        const formatRupiah = (number) => {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+        };
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // --- LOGIN SYSTEM ---
+        function openLoginModal() {
+            document.getElementById('modal-login').classList.remove('hide');
+            toggleAuthMode('login'); 
+        }
+
+        function closeLoginModal() {
+            document.getElementById('modal-login').classList.add('hide');
+        }
+
+        function toggleAuthMode(mode) {
+            const loginView = document.getElementById('view-login');
+            const registerView = document.getElementById('view-register');
+            
+            if (mode === 'register') {
+                loginView.classList.add('hide');
+                registerView.classList.remove('hide');
+            } else {
+                registerView.classList.add('hide');
+                loginView.classList.remove('hide');
+            }
+        }
+
+        function processAuth(e, mode) {
+            e.preventDefault(); 
+            
+            const userName = mode === 'register' ? document.getElementById('reg-name').value : 'Member';
+            
+            toggleLoading(true);
+            setTimeout(() => {
+                toggleLoading(false);
+                closeLoginModal();
+                isLoggedIn = true;
+                
+                // Mengubah Tombol Auth Menjadi Profil
+                const authHTML = `
+                    <div class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-50 hover:border-blue-300 transition-all shadow-sm">
+                        <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm shadow-inner">
+                            ${userName.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="hidden md:block">
+                            <span class="text-gray-800 text-sm font-bold block leading-tight">${userName.split(' ')[0]}</span>
+                            <span class="text-blue-600 text-[10px] font-bold uppercase tracking-wider block">Member</span>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('auth-container').innerHTML = authHTML;
+                document.getElementById('mobile-auth-container').innerHTML = authHTML;
+                document.getElementById('mobile-auth-action').classList.add('hide');
+                
+                // Isi otomatis nomor telepon di form jika ada
+                const phoneInput = mode === 'register' ? document.getElementById('reg-email').value : document.getElementById('login-email').value;
+                if(!isNaN(phoneInput) && phoneInput.trim() !== '') {
+                    document.getElementById('input-phone').value = phoneInput;
+                }
+                
+            }, 1200);
+        }
+
+        // --- NAVIGATION ---
+        function switchView(viewId) {
+            // Sembunyikan semua tampilan yang ada
+            document.getElementById('view-home').classList.add('hide');
+            document.getElementById('view-detail').classList.add('hide');
+            document.getElementById('view-payment').classList.add('hide');
+            document.getElementById('view-invoice').classList.add('hide');
+            document.getElementById('view-track').classList.add('hide');
+            document.getElementById('view-tnc').classList.add('hide');
+            document.getElementById('view-privacy').classList.add('hide');
+            
+            // Tampilkan tampilan yang dituju
+            document.getElementById(`view-${viewId}`).classList.remove('hide');
+            window.scrollTo(0, 0);
+            currentView = viewId;
+        }
+
+        function goHome() {
+            switchView('home');
+            selectedGame = null;
+            resetForm();
+            clearInterval(timerInterval);
+            
+            // Reset pencarian
+            document.getElementById('search-desktop').value = '';
+            const mobileSearch = document.getElementById('search-mobile');
+            if(mobileSearch) mobileSearch.value = '';
+            renderGames();
+        }
+
+        // --- RENDERING VIEWS ---
+        function renderGames(data = GAMES) {
+            const grid = document.getElementById('games-grid');
+            
+            // Jika pencarian tidak menemukan hasil
+            if (data.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-gray-500 bg-gray-50 rounded-2xl border border-dashed border-gray-300 transition-all">
+                        <i data-lucide="search-x" class="w-12 h-12 mx-auto mb-3 text-gray-400 animate-pulse"></i>
+                        <p class="font-bold text-gray-700">Game tidak ditemukan.</p>
+                        <p class="text-sm mt-1">Coba gunakan kata kunci lain.</p>
+                    </div>`;
+                lucide.createIcons();
+                return;
+            }
+
+            grid.innerHTML = data.map(game => `
+                <div onclick="selectGame('${game.id}')" class="group bg-white rounded-2xl p-3 cursor-pointer border border-gray-200 hover:border-blue-500 hover-gold-glow hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="aspect-square rounded-xl overflow-hidden mb-3 relative border border-gray-100 bg-gray-50">
+                        <img src="${game.image}" 
+                             onerror="this.src='https://ui-avatars.com/api/?name=${game.name.substring(0,2)}&background=2563eb&color=fff&size=200'" 
+                             alt="${game.name}" 
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <h3 class="font-bold text-gray-800 text-sm sm:text-base truncate group-hover:text-blue-600 transition-colors">${game.name}</h3>
+                    <p class="text-[11px] font-medium text-blue-600 mt-0.5">${game.publisher}</p>
+                </div>
+            `).join('');
+        }
+
+        function selectGame(id) {
+            selectedGame = GAMES.find(g => g.id === id);
+            resetForm();
+            
+            // Setup Detail Page Info
+            const imgEl = document.getElementById('detail-game-img');
+            imgEl.src = selectedGame.image;
+            imgEl.onerror = function() { this.src = `https://ui-avatars.com/api/?name=${selectedGame.name.substring(0,2)}&background=2563eb&color=fff&size=200`; };
+            
+            document.getElementById('detail-game-name').innerText = selectedGame.name;
+            document.getElementById('detail-game-pub').innerText = selectedGame.publisher;
+            
+            // Setup Form (Zone ID)
+            const zoneContainer = document.getElementById('zone-id-container');
+            if (selectedGame.hasZone) {
+                zoneContainer.classList.remove('hide');
+            } else {
+                zoneContainer.classList.add('hide');
+            }
+
+            renderNominals(); // Panggil render list nominal khusus game ini
+            switchView('detail');
+            lucide.createIcons();
+        }
+
+        function renderNominals() {
+            const grid = document.getElementById('nominals-grid');
+            
+            // Cegah error jika belum ada game yang dipilih
+            if (!selectedGame) {
+                grid.innerHTML = '';
+                return;
+            }
+
+            // Memanggil nominal khusus dari selectedGame.nominals
+            grid.innerHTML = selectedGame.nominals.map(nom => `
+                <div id="nom-${nom.id}" onclick="selectNominal('${nom.id}')" class="nominal-card relative cursor-pointer rounded-xl p-4 border bg-white border-gray-200 hover:border-blue-400 hover:bg-blue-50/50 transition-all duration-200 hover:shadow-md transform hover:-translate-y-0.5">
+                    <div id="nom-check-${nom.id}" class="hide absolute top-2 right-2 text-white bg-blue-600 rounded-full p-0.5 shadow-sm transform scale-110 transition-transform">
+                        <i data-lucide="check" class="h-4 w-4"></i>
+                    </div>
+                    <h3 class="font-bold text-gray-800 mb-1">${nom.name}</h3>
+                    <p class="text-xs text-gray-400 line-through decoration-gray-400">${formatRupiah(nom.price + 5000)}</p>
+                    <p class="text-lg font-black text-blue-600 mt-1">${formatRupiah(nom.price)}</p>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function selectNominal(id) {
+            // Mencari di dalam list game yang sedang dipilih
+            selectedNominal = selectedGame.nominals.find(n => n.id === id);
+            
+            // Reset styling
+            document.querySelectorAll('.nominal-card').forEach(el => {
+                el.classList.remove('bg-blue-50', 'border-blue-500', 'ring-2', 'ring-blue-500', 'shadow-md', 'scale-[1.02]');
+                el.classList.add('bg-white', 'border-gray-200');
+            });
+            document.querySelectorAll('[id^="nom-check-"]').forEach(el => el.classList.add('hide'));
+
+            // Apply selected styling
+            const card = document.getElementById(`nom-${id}`);
+            card.classList.add('bg-blue-50', 'border-blue-500', 'ring-2', 'ring-blue-500', 'shadow-md', 'scale-[1.02]');
+            card.classList.remove('bg-white', 'border-gray-200');
+            document.getElementById(`nom-check-${id}`).classList.remove('hide');
+
+            updateTotal();
+        }
+
+        // --- RENDERING METODE PEMBAYARAN DENGAN LOGO ASSET ---
+        function renderPaymentMethods() {
+            const list = document.getElementById('payments-list');
+            list.innerHTML = PAYMENT_METHODS.map(method => `
+                <div id="pay-${method.id}" onclick="selectPayment('${method.id}')" class="payment-card flex items-center justify-between p-4 rounded-xl cursor-pointer border bg-white border-gray-200 hover:border-blue-400 hover:bg-blue-50/50 transition-all duration-200 transform hover:-translate-x-1">
+                    <div class="flex items-center">
+                        <div class="w-16 h-10 rounded-xl bg-gray-50 flex items-center justify-center mr-3 border border-gray-100 p-1.5 transition-colors duration-200 overflow-hidden" id="pay-icon-bg-${method.id}">
+                            <img src="${method.image}" alt="${method.name}" class="h-full w-full object-contain transform hover:scale-110 transition-transform" onerror="this.onerror=null; this.outerHTML='<i data-lucide=\\'credit-card\\' class=\\'h-5 w-5 text-gray-500\\'></i>'; lucide.createIcons();">
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-800">${method.name}</p>
+                            <p class="text-[11px] font-medium text-gray-500 mt-0.5">${method.category}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-0.5">Biaya</p>
+                        <p class="font-bold text-sm ${method.fee === 'Gratis' ? 'text-green-500' : 'text-gray-700'}">${method.fee}</p>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function selectPayment(id) {
+            selectedPayment = PAYMENT_METHODS.find(p => p.id === id);
+
+            // Reset styling
+            document.querySelectorAll('.payment-card').forEach(el => {
+                el.classList.remove('bg-blue-50', 'border-blue-500', 'ring-2', 'ring-blue-500', 'shadow-sm');
+                el.classList.add('bg-white', 'border-gray-200');
+            });
+            document.querySelectorAll('[id^="pay-icon-bg-"]').forEach(el => el.classList.replace('bg-white', 'bg-gray-50'));
+
+            // Apply selected styling
+            const card = document.getElementById(`pay-${id}`);
+            card.classList.add('bg-blue-50', 'border-blue-500', 'ring-2', 'ring-blue-500', 'shadow-sm');
+            card.classList.remove('bg-white', 'border-gray-200');
+            
+            document.getElementById(`pay-icon-bg-${id}`).classList.replace('bg-gray-50', 'bg-white');
+            
+            updateTotal();
+        }
+
+        // FUNGSI UPDATE TOTAL DAN PROMO
+        function updateTotal() {
+            if (!selectedNominal) {
+                finalTotal = 0;
+                document.getElementById('total-price').innerText = 'Rp 0';
+                return;
+            }
+            
+            let total = selectedNominal.price;
+            
+            if (selectedPayment) {
+                total += selectedPayment.feeAmount;
+            }
+            
+            if (isPromoApplied) {
+                discountAmount = Math.floor(total * 0.10); // Diskon 10%
+                total -= discountAmount;
+            } else {
+                discountAmount = 0;
+            }
+            
+            finalTotal = total;
+            
+            if (isPromoApplied) {
+                document.getElementById('total-price').innerHTML = `
+                    <span class="text-sm text-gray-400 line-through mr-3 font-semibold">${formatRupiah(selectedNominal.price + (selectedPayment ? selectedPayment.feeAmount : 0))}</span>
+                    ${formatRupiah(finalTotal)}
+                `;
+            } else {
+                document.getElementById('total-price').innerText = formatRupiah(finalTotal);
+            }
+        }
+
+        function applyPromo() {
+            const promoInput = document.getElementById('input-promo').value.toUpperCase().trim();
+            const btn = document.getElementById('btn-apply-promo');
+            const msg = document.getElementById('promo-msg');
+            
+            if (!selectedNominal) {
+                showError("Pilih nominal top-up terlebih dahulu untuk menerapkan promo!");
+                return;
+            }
+
+            if (promoInput === 'ELITEZONE50') {
+                isPromoApplied = true;
+                btn.innerText = "Terpakai";
+                btn.classList.remove('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
+                btn.classList.add('bg-green-500', 'text-white', 'hover:bg-green-600', 'border-green-600', 'shadow-md', 'shadow-green-500/30');
+                document.getElementById('input-promo').disabled = true;
+                
+                msg.innerHTML = `<i data-lucide="check-circle-2" class="inline w-4 h-4 mr-1 mb-0.5"></i> Promo diskon 10% berhasil diterapkan!`;
+                msg.classList.remove('hide', 'text-red-500');
+                msg.classList.add('text-green-600');
+                lucide.createIcons();
+                updateTotal();
+            } else {
+                isPromoApplied = false;
+                msg.innerHTML = `<i data-lucide="x-circle" class="inline w-4 h-4 mr-1 mb-0.5"></i> Kode promo tidak valid atau sudah kadaluarsa.`;
+                msg.classList.remove('hide', 'text-green-600');
+                msg.classList.add('text-red-500');
+                lucide.createIcons();
+                updateTotal();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('input-game-id').value = '';
+            document.getElementById('input-zone-id').value = '';
+            if(!isLoggedIn) document.getElementById('input-phone').value = '';
+            
+            // Reset Promo
+            isPromoApplied = false;
+            discountAmount = 0;
+            document.getElementById('input-promo').value = '';
+            document.getElementById('input-promo').disabled = false;
+            const btnPromo = document.getElementById('btn-apply-promo');
+            if(btnPromo) {
+                btnPromo.innerText = "Terapkan";
+                btnPromo.className = "bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-bold transition-colors";
+            }
+            const msgPromo = document.getElementById('promo-msg');
+            if(msgPromo) msgPromo.classList.add('hide');
+            
+            selectedNominal = null;
+            selectedPayment = null;
+            updateTotal();
+            
+            // Mengembalikan layout standar banner kesalahan
+            const errBanner = document.getElementById('error-banner');
+            errBanner.className = "hide bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl flex items-center shadow-sm transition-all";
+
+            if(selectedGame) renderNominals();
+            renderPaymentMethods();
+        }
+
+        function showError(msg) {
+            document.getElementById('error-text').innerText = msg;
+            document.getElementById('error-banner').classList.remove('hide');
+            window.scrollTo({ top: 400, behavior: 'smooth' });
+        }
+
+        function toggleLoading(show) {
+            const overlay = document.getElementById('loading-overlay');
+            if (show) overlay.classList.remove('hide');
+            else overlay.className = 'hide fixed inset-0 z-[80] flex items-center justify-center bg-white/80 backdrop-blur-sm fade-in';
+        }
+
+        // --- FITUR SEARCH ---
+        function handleSearch(query) {
+            if (currentView !== 'home') {
+                switchView('home');
+                document.getElementById('games-section').scrollIntoView({behavior: 'smooth'});
+            }
+            
+            const q = query.toLowerCase().trim();
+            const filtered = GAMES.filter(g => 
+                g.name.toLowerCase().includes(q) || 
+                g.publisher.toLowerCase().includes(q)
+            );
+            
+            document.getElementById('search-desktop').value = query;
+            const mobileSearch = document.getElementById('search-mobile');
+            if(mobileSearch) mobileSearch.value = query;
+
+            renderGames(filtered);
+        }
+
+        // --- FITUR TRACK ORDER (CEK PESANAN) ---
+        function processTrack(e) {
+            e.preventDefault();
+            const inputVal = document.getElementById('track-input').value.trim().toUpperCase();
+            if (!inputVal) return;
+
+            toggleLoading(true);
+            const resultEl = document.getElementById('track-result');
+            resultEl.classList.add('hide');
+
+            setTimeout(() => {
+                toggleLoading(false);
+                
+                // Cari transaksi di database mock lokal
+                let trx = TRANSACTIONS_DB[inputVal];
+                
+                // Jika tidak ditemukan langsung, coba cari berdasarkan Nomor WhatsApp
+                if (!trx) {
+                    const foundKey = Object.keys(TRANSACTIONS_DB).find(key => {
+                        const cleanDbPhone = TRANSACTIONS_DB[key].phone.replace(/[^0-9]/g, '');
+                        const cleanInputPhone = inputVal.replace(/[^0-9]/g, '');
+                        return cleanDbPhone === cleanInputPhone && cleanInputPhone !== '';
+                    });
+                    if (foundKey) {
+                        trx = TRANSACTIONS_DB[foundKey];
+                    }
+                }
+
+                // Fallback pesanan dummy (jika belum ada data checkout sungguhan)
+                if (!trx) {
+                    trx = {
+                        invoiceId: inputVal.startsWith('INV-') ? inputVal : 'INV-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+                        date: new Date().toLocaleString('id-ID'),
+                        gameName: selectedGame ? selectedGame.name : 'Mobile Legends',
+                        userId: '12345678 (9999)',
+                        nickname: 'Player_GGWP_Elite',
+                        item: selectedNominal ? selectedNominal.name : '86 Diamonds',
+                        paymentMethod: selectedPayment ? selectedPayment.name : 'GoPay',
+                        totalPaid: selectedNominal ? formatRupiah(finalTotal) : 'Rp 23.000',
+                        phone: '081234567890',
+                        status: 'Pembayaran Berhasil'
+                    };
+                    // Simpan data fallback ke DB lokal agar konsisten jika dicari kembali
+                    TRANSACTIONS_DB[trx.invoiceId] = trx;
+                }
+
+                // Merender INVOICE Resmi Lengkap dengan Pembayaran Berhasil, Rincian Transaksi, dan Total Dibayar
+                resultEl.innerHTML = `
+                    <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg mt-4 fade-in transform transition-all hover:shadow-xl">
+                        <div class="bg-green-50 p-6 text-center border-b border-green-100 flex flex-col items-center justify-center">
+                            <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mb-3 shadow-md shadow-green-500/20 transform hover:scale-110 transition-transform">
+                                <i data-lucide="check" class="h-6 w-6 text-white font-bold"></i>
+                            </div>
+                            <h2 class="text-xl font-bold text-green-800 mb-0.5">${trx.status}!</h2>
+                            <p class="text-green-600 text-xs font-semibold">No. Invoice: ${trx.invoiceId}</p>
+                        </div>
+                        
+                        <div class="p-6">
+                            <h3 class="font-bold text-gray-800 text-xs uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Rincian Transaksi</h3>
+                            <div class="space-y-3 text-sm text-gray-600">
+                                <div class="flex justify-between hover:bg-gray-50 p-1 rounded transition-colors">
+                                    <span>Tanggal Trx</span>
+                                    <span class="font-medium text-gray-900">${trx.date}</span>
+                                </div>
+                                <div class="flex justify-between hover:bg-gray-50 p-1 rounded transition-colors">
+                                    <span>Game</span>
+                                    <span class="font-bold text-blue-600">${trx.gameName}</span>
+                                </div>
+                                <div class="flex justify-between hover:bg-gray-50 p-1 rounded transition-colors">
+                                    <span>ID Tujuan</span>
+                                    <span class="font-bold text-gray-900">${trx.userId}</span>
+                                </div>
+                                <div class="flex justify-between hover:bg-gray-50 p-1 rounded transition-colors">
+                                    <span>Nickname</span>
+                                    <span class="font-bold text-gray-900 bg-gray-100 px-2.5 py-0.5 rounded shadow-sm">${trx.nickname}</span>
+                                </div>
+                                <div class="flex justify-between hover:bg-gray-50 p-1 rounded transition-colors">
+                                    <span>Item</span>
+                                    <span class="font-medium text-gray-900">${trx.item}</span>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-100 pb-3 hover:bg-gray-50 p-1 rounded transition-colors">
+                                    <span>Metode Pembayaran</span>
+                                    <span class="font-medium text-gray-900">${trx.paymentMethod}</span>
+                                </div>
+                                <div class="flex justify-between pt-2">
+                                    <span class="text-gray-800 font-bold text-base">Total Dibayar</span>
+                                    <span class="font-black text-blue-600 text-lg drop-shadow-sm">${trx.totalPaid}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                resultEl.classList.remove('hide');
+                lucide.createIcons();
+            }, 1200);
+        }
+
+        // --- ACTIONS ---
+
+        // 1. Tombol Beli Ditekan
+        function handleCheckout() {
+            document.getElementById('error-banner').classList.add('hide');
+            
+            const gameId = document.getElementById('input-game-id').value;
+            const zoneId = document.getElementById('input-zone-id').value;
+            const phone = document.getElementById('input-phone').value;
+
+            // Validasi
+            if (!gameId) return showError('ID Game / User ID wajib diisi!');
+            if (selectedGame.hasZone && !zoneId) return showError('Zone ID wajib diisi!');
+            if (!selectedNominal) return showError('Silakan pilih nominal Top-Up terlebih dahulu!');
+            if (!phone || phone.length < 9) return showError('Nomor WhatsApp yang dimasukkan tidak valid!');
+            if (!selectedPayment) return showError('Silakan pilih metode pembayaran!');
+
+            toggleLoading(true);
+
+            // Simulasi API Cek ID
+            setTimeout(() => {
+                toggleLoading(false);
+                if (gameId.endsWith('000')) {
+                    return showError('ID Game tidak ditemukan (Simulasi error). Jangan gunakan ID berakhiran 000.');
+                }
+
+                // Sukses divalidasi
+                validatedName = 'Player_GGWP_' + Math.floor(Math.random() * 99);
+                
+                // Set Modal Data
+                document.getElementById('conf-game').innerText = selectedGame.name;
+                document.getElementById('conf-userid').innerText = selectedGame.hasZone ? `${gameId} (${zoneId})` : gameId;
+                document.getElementById('conf-nickname').innerText = validatedName;
+                
+                document.getElementById('modal-confirm').classList.remove('hide');
+            }, 1200);
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('modal-confirm').classList.add('hide');
+        }
+
+        // 2. Lanjut ke Pembayaran
+        function openPayment() {
+            closeConfirmModal();
+            toggleLoading(true);
+
+            setTimeout(() => {
+                toggleLoading(false);
+                switchView('payment');
+
+                // Generate ID Invoice unik untuk sesi pembayaran ini
+                currentInvoiceId = 'INV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                
+                // Set Nilai No. Invoice pada bagian Header Halaman Pembayaran
+                document.getElementById('payment-invoice-id').innerText = currentInvoiceId;
+
+                // Setup Payment Data
+                const logoEl = document.getElementById('pay-method-logo');
+                if (selectedPayment && selectedPayment.image) {
+                    logoEl.src = selectedPayment.image;
+                    logoEl.alt = selectedPayment.name;
+                    logoEl.classList.remove('hide');
+                } else {
+                    logoEl.classList.add('hide');
+                }
+
+                document.getElementById('pay-method-name').innerText = selectedPayment.name;
+                document.getElementById('pay-amount').innerText = formatRupiah(finalTotal); // Menggunakan Total yang sudah di diskon
+                
+                // Daftarkan Transaksi ke Database Mock Lokal dengan Status "Pembayaran Berhasil"
+                const gameId = document.getElementById('input-game-id').value;
+                const zoneId = document.getElementById('input-zone-id').value;
+                const phone = document.getElementById('input-phone').value;
+
+                TRANSACTIONS_DB[currentInvoiceId] = {
+                    invoiceId: currentInvoiceId,
+                    date: new Date().toLocaleString('id-ID'),
+                    gameName: selectedGame.name,
+                    userId: selectedGame.hasZone ? `${gameId} (${zoneId})` : gameId,
+                    nickname: validatedName,
+                    item: selectedNominal.name,
+                    paymentMethod: selectedPayment.name,
+                    totalPaid: formatRupiah(finalTotal),
+                    phone: phone,
+                    status: 'Pembayaran Berhasil' 
+                };
+
+                const qrisCont = document.getElementById('qris-container');
+                const vaCont = document.getElementById('va-container');
+
+                if (selectedPayment.type === 'qris') {
+                    qrisCont.classList.remove('hide');
+                    vaCont.classList.add('hide');
+                } else {
+                    qrisCont.classList.add('hide');
+                    vaCont.classList.remove('hide');
+                    // Generate random VA
+                    const bankCode = selectedPayment.id === 'bca' ? '8077' : '8822';
+                    const randomVA = Math.floor(100000000000 + Math.random() * 900000000000);
+                    document.getElementById('va-number').innerText = `${bankCode} ${String(randomVA).match(/.{1,4}/g).join(' ')}`;
+                }
+
+                startTimer();
+            }, 800);
+        }
+
+        function copyVA() {
+            const vaNum = document.getElementById('va-number').innerText.replace(/\s/g, '');
+            const el = document.createElement('textarea');
+            el.value = vaNum;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            
+            // Indikator UI Tersalin pengganti Alert
+            const btn = document.getElementById('btn-copy-va');
+            const origHtml = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="check" class="h-4 w-4 mr-1"></i> Tersalin`;
+            btn.classList.add('bg-green-500', 'text-white', 'border-green-600');
+            lucide.createIcons();
+            setTimeout(() => {
+                btn.innerHTML = origHtml;
+                btn.classList.remove('bg-green-500', 'text-white', 'border-green-600');
+                lucide.createIcons();
+            }, 2500);
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            let time = 15 * 60; // 15 menit
+            const timerEl = document.getElementById('payment-timer');
+            
+            timerInterval = setInterval(() => {
+                const minutes = Math.floor(time / 60);
+                let seconds = time % 60;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+                timerEl.innerText = `${minutes}:${seconds}`;
+                time--;
+                if (time < 0) {
+                    clearInterval(timerInterval);
+                    // Langsung batalkan bila waktu habis
+                    switchView('home');
+                    document.getElementById('error-text').innerText = 'Waktu pembayaran Anda telah habis. Silakan buat pesanan ulang.';
+                    document.getElementById('error-banner').classList.remove('hide');
+                    window.scrollTo({ top: 400, behavior: 'smooth' });
+                }
+            }, 1000);
+        }
+
+        function cancelPayment() {
+            goHome(); // Navigasi keluar langsung tanpa confirm box
+        }
+
+        // 3. Tombol "Menunggu Pembayaran" diklik -> Menuju Halaman Beranda & Menampilkan No. Invoice
+        function goToHomeFromPayment() {
+            clearInterval(timerInterval);
+            toggleLoading(true);
+
+            setTimeout(() => {
+                toggleLoading(false);
+                
+                // Arahkan kembali ke Halaman Utama
+                goHome();
+
+                // Munculkan banner informasi transaksi sukses pada Beranda, lengkap dengan No. Invoice yang bisa disalin
+                const banner = document.getElementById('error-banner');
+                const text = document.getElementById('error-text');
+                
+                banner.className = "bg-blue-50 border border-blue-200 text-blue-800 p-5 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between shadow-md gap-3 transform hover:scale-[1.01] transition-transform";
+                text.className = "text-sm font-medium flex-1";
+                text.innerHTML = `
+                    <div class="flex items-start">
+                        <i data-lucide="info" class="h-5 w-5 mr-2 text-blue-500 shrink-0 mt-0.5 animate-pulse"></i>
+                        <div>
+                            <p class="font-extrabold text-blue-950 mb-0.5">Transaksi Sedang Diproses!</p>
+                            <p class="text-xs text-blue-700">Gunakan No. Invoice ini untuk melacak status pesanan Anda: <strong class="bg-blue-100 text-blue-900 px-1.5 py-0.5 rounded font-mono select-all cursor-pointer hover:bg-blue-200 transition-colors">${currentInvoiceId}</strong></p>
+                        </div>
+                    </div>
+                `;
+                
+                // Buat tombol Lacak Otomatis di samping informasi banner
+                const trackBtn = document.createElement('button');
+                trackBtn.className = "bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-5 rounded-lg shadow-sm transition-all transform active:scale-95 shrink-0";
+                trackBtn.innerText = "Lacak Pesanan";
+                trackBtn.onclick = () => {
+                    switchView('track');
+                    document.getElementById('track-input').value = currentInvoiceId;
+                    const mockEvent = { preventDefault: () => {} };
+                    processTrack(mockEvent);
+                };
+                
+                banner.appendChild(trackBtn);
+                banner.classList.remove('hide');
+                lucide.createIcons();
+
+                // Gulir halaman sedikit ke bawah agar banner terlihat jelas
+                window.scrollTo({ top: 320, behavior: 'smooth' });
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
